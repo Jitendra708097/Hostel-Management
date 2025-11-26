@@ -15,7 +15,6 @@ const circularRouter = require('./routes/circularRoutes')
 const leaveRouter = require('./routes/leaveRoutes');
 const grievanceRouter = require('./routes/grievanceRouter');
 const feeRouter = require('./routes/feesRoutes');
-const contactRouter = require('./routes/contactRouter');
 
 
 app.use(cookieParser());
@@ -38,7 +37,6 @@ app.use('/attendance',attendenceRouter);
 app.use('/leave',leaveRouter);
 app.use('/grievance',grievanceRouter);
 app.use('/fees',feeRouter);
-app.use('/contact', contactRouter);
 
 
 const startServer = async() => {
