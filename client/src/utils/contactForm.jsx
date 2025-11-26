@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import emailjs from '@emailjs/browser';
-// import { SectionWrapper } from './SectionWrapper';
 import { MapPin, Phone, Mail, CheckCircle } from 'lucide-react';
 
 const schema = z.object({
