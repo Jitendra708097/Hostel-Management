@@ -13,7 +13,7 @@ import ProfilePhotoUploader from '../../components/common/ProfilePhotoUploader';
 // --- ICONS ---
 import { FaUser, FaEnvelope, FaLock, FaGraduationCap, FaCalendarAlt, FaUniversity, FaArrowRight, FaEye, FaEyeSlash, FaSignInAlt } from 'react-icons/fa';
 import 'react-image-crop/dist/ReactCrop.css';
-import { is } from 'zod/v4/locales';
+
 
 
 // Zod Schema for Validation (Updated with profilePhoto)
@@ -41,10 +41,10 @@ const RegisterForm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Hii");
-    console.log("isAuthenticate: ",isAuthenticate,user);
+    // console.log("Hii");
+    // console.log("isAuthenticate: ",isAuthenticate,user);
     if (isAuthenticate && user?.role === 'student') {
-      console.log("Hello");
+      // console.log("Hello");
       navigate("/student/dashboard");
     }
   }, [isAuthenticate]);

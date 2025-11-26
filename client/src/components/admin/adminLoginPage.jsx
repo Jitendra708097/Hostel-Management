@@ -11,7 +11,7 @@ import hostelImageUrl from '../../assests/HostelImages/hostel1.png';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email format'),
-  password: z.string().min(6, 'Password is required').min(10, 'Password must be at least 6 characters')
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
 });
 
 const AdminLoginPage = () => {
