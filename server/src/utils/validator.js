@@ -5,12 +5,18 @@ const User = require('../models/User');
 
 const validatorFunction = async (data) => {
 
+    // const mandatoryFields = ['emailId', 'password', 'userName', 'year', 'course', 'institution'];
+    // for (const field of mandatoryFields) {
+    //     if (!data[field]) {
+    //         return { valid: false, message: `${field} is required.` };
+    //     }
+    // }
     const mandatoryFields = ['emailId', 'password', 'userName', 'year', 'course', 'institution'];
-    for (const field of mandatoryFields) {
-        if (!data[field]) {
-            return { valid: false, message: `${field} is required.` };
+    Object.keys(data).forEach(key => {
+        if (mandatoryFields.includes(key) && !data[key]) {
+            return { valid: false, message: `${key} is required.` };
         }
-    }
+    });
 
     const checkedEmail = await User.findOne({ emailId: data.emailId });
     if (checkedEmail) {
