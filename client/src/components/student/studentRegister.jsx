@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { registerUser } from '../../redux/authSlicer';
-import logoImg from '../../assests/HostelImages/hostelPhoto.png';
+import logoImg from '../../assests/hostelPhoto.png';
 import ProfilePhotoUploader from '../../components/common/ProfilePhotoUploader';
 
 // --- ICONS ---

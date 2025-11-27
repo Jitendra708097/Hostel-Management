@@ -7,7 +7,7 @@ import { School, LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react'; // Remove
 import { motion } from 'framer-motion'; // Removed AnimatePresence as it's not used directly here
 import { useDispatch, useSelector } from 'react-redux';
 import { adminLoginUser } from '../../redux/authSlicer';
-import hostelImageUrl from '../../assests/HostelImages/hostel1.png';
+import hostelImageUrl from '../../assests/hostel1.png';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email format'),

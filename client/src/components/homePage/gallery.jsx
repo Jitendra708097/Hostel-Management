@@ -1,8 +1,8 @@
-import room1 from "../../assests/HostelImages/room1.png";
-import room2 from "../../assests/HostelImages/room2.png";
-import room3 from "../../assests/HostelImages/room3.png";
-import room4 from "../../assests/HostelImages/room4.png";
-import hostelGallary from "../../assests/HostelImages/hostelGallary.png";
+import room1 from "../../assests/room1.png";
+import room2 from "../../assests/room2.png";
+import room3 from "../../assests/room3.png";
+import room4 from "../../assests/room4.png";
+import hostelGallary from "../../assests/hostelGallary.png";
 import { motion } from "framer-motion";
 
 const GallerySection = () => {
@@ -35,7 +35,7 @@ const GallerySection = () => {
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-br from-slate-50 to-blue-50/30">
+    <section className="py-16 bg-linear-to-br from-slate-50 to-blue-50/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -71,7 +71,7 @@ const GallerySection = () => {
                 />
                 
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 via-slate-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 
                 {/* Content Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
@@ -81,12 +81,6 @@ const GallerySection = () => {
                   <p className="text-slate-200 text-sm mb-4 line-clamp-2">
                     {item.description}
                   </p>
-                  <button className="bg-white text-slate-800 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors duration-200 flex items-center gap-2">
-                    Read More
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
                 </div>
               </div>
               
@@ -102,19 +96,6 @@ const GallerySection = () => {
             </motion.div>
           ))}
         </div>
-
-        {/* View More Button */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.6 }}
-          className="text-center mt-12"
-        >
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg">
-            View All Photos
-          </button>
-        </motion.div>
       </div>
     </section>
   );

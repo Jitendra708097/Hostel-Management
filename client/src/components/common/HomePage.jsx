@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
-import heroImageUrl from '../../assests/HostelImages/hostelPhoto.png';
-import universityLogo from '../../assests/HostelImages/hritlogo2.jpg';
+import { motion, useScroll, useSpring } from 'framer-motion';
+import heroImageUrl from '../../assests/hostelPhoto.png';
+import universityLogo from '../../assests/hritlogo2.jpg';
 import { Link } from 'react-router';
 import axiosClient from '../../config/axiosClient';
 import { LogIn, UserPlus, Utensils, MapPin, Star, Wifi, Shield, Dumbbell, Users } from 'lucide-react';
@@ -11,7 +11,6 @@ import Facilities from '../../components/homePage/facilities';
 import FEES from '../../components/homePage/feesFacility';
 import GallerySection from '../../components/homePage/gallery';
 import Footer from '../../components/homePage/footer';
-import { is } from 'zod/v4/locales';
 
 
 const HomePage = () => {
@@ -323,12 +322,8 @@ const HomePage = () => {
         {/* Leadership Section */}
         <SectionWrapper id="leadership" className="bg-white">
   <div className="text-center mb-16">
-    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-2 rounded-full border border-blue-100 mb-4">
-      <Users className="w-4 h-4 text-blue-600" />
-      <span className="text-sm font-semibold text-blue-700">OUR TEAM</span>
-    </div>
     <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-      Meet Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Visionary Leaders</span>
+      Meet Our <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600">Visionary Leaders</span>
     </h2>
     <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
       Dedicated professionals committed to creating the best student living experience

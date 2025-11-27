@@ -1,6 +1,5 @@
 import { FaLinkedin, FaFacebook, FaTwitterSquare, FaInstagramSquare } from 'react-icons/fa';
-import { motion } from 'framer-motion';
-import universityLogo from '../../assests/HostelImages/hritlogo2.jpg';
+import universityLogo from '../../assests/hritlogo2.jpg';
 import { ArrowRight,Mail,Phone } from 'lucide-react';
 import { Link } from'react-router';
 

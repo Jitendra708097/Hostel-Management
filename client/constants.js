@@ -1,7 +1,7 @@
 import { Wifi, WashingMachine, Dumbbell, ShieldCheck, Coffee, Utensils, BriefcaseMedical, Cctv, Power } from 'lucide-react';
-import chancellorImg from './src/assests/Leaders/chancellor.jpg';
-import Hosteldirector from './src/assests/Leaders/abhay-yadav.jpeg';
-import vcImg from './src/assests/Leaders/dk-sharma.jpeg';
+import chancellorImg from './src/assests/chancellor.jpg';
+import Hosteldirector from './src/assests/abhay-yadav.jpeg';
+import vcImg from './src/assests/dk-sharma.jpeg';
 
 
 export const COURSES = [
