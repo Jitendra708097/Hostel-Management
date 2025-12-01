@@ -69,26 +69,30 @@ const StudentAttendenceRecords = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <div className="p-4 md:p-8 bg-gray-100 min-h-screen">
+      <div className="max-w-4xl mx-auto bg-gray-200 p-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">My Attendance</h1>
+
+         {/* Attention of student regarding attendence records */}
         <div className="flex items-center gap-4 mb-4">
           <div className="flex items-center gap-2">
             <span className="inline-block w-4 h-4 rounded-sm bg-green-500" />
-            <span className="text-sm text-gray-700">Present</span>
+            <span className="text-sm text-gray-800">Present</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-block w-4 h-4 rounded-sm bg-red-500" />
-            <span className="text-sm text-gray-700">Absent</span>
+            <span className="text-sm text-gray-800">Absent</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-block w-4 h-4 rounded-sm bg-gray-200 border" />
-            <span className="text-sm text-gray-700">Not marked</span>
+            <span className="text-sm text-gray-800">Not marked</span>
           </div>
         </div>
         <div className="flex justify-between items-center mb-6 gap-4">
+
+          {/* For Month Selection */}
           <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-600">Month</label>
+            <label className="text-sm text-gray-800">Month</label>
             <select
               aria-label="Select month"
               value={currentDate.getMonth()}
@@ -96,7 +100,7 @@ const StudentAttendenceRecords = () => {
                 const monthIndex = Number(e.target.value);
                 setCurrentDate(prev => new Date(prev.getFullYear(), monthIndex, 1));
               }}
-              className="px-3 py-2 border rounded-md bg-white"
+              className="px-3 py-2 border rounded-md bg-gray-200"
             >
               {Array.from({ length: 12 }).map((_, m) => (
                 <option key={m} value={m}>{new Date(0, m).toLocaleString('default', { month: 'long' })}</option>
@@ -104,8 +108,9 @@ const StudentAttendenceRecords = () => {
             </select>
           </div>
 
+          {/* For Year Selection */}
           <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-600">Year</label>
+            <label className="text-sm text-gray-800">Year</label>
             <select
               aria-label="Select year"
               value={currentDate.getFullYear()}
@@ -113,12 +118,12 @@ const StudentAttendenceRecords = () => {
                 const y = Number(e.target.value);
                 setCurrentDate(prev => new Date(y, prev.getMonth(), 1));
               }}
-              className="px-3 py-2 border rounded-md bg-white"
+              className="px-3 py-2 border rounded-md bg-gray-200"
             >
               {(() => {
                 const years = [];
                 const thisYear = new Date().getFullYear();
-                for (let y = thisYear - 3; y <= thisYear + 1; y++) years.push(y);
+                for (let y = thisYear - 0; y <= thisYear + 1; y++) years.push(y);
                 return years.map((yr) => <option key={yr} value={yr}>{yr}</option>);
               })()}
             </select>
@@ -129,6 +134,7 @@ const StudentAttendenceRecords = () => {
           </h2>
         </div>
 
+        {/* attendence summary  */}
         <div className="p-4 mb-6 bg-blue-50 border border-blue-200 rounded-lg grid grid-cols-3 gap-4">
           <div>
             <h4 className="text-sm text-gray-600">Present</h4>

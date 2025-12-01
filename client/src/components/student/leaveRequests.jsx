@@ -103,11 +103,11 @@ const StudentLeaveDashboard = () => {
         // isBefore(today, parseISO(app.endDate)) // Leave has not ended
     );
 
-    console.log("Applications: ",applications);
-    console.log("startDate: ",applications[0]?.startDate);
-    console.log("today: ",today);
-    console.log("Status: ",applications[0]?.status);
-    console.log("activeGatePass: ",activeGatePassApp);
+    // console.log("Applications: ",applications);
+    // console.log("startDate: ",applications[0]?.startDate);
+    // console.log("today: ",today);
+    // console.log("Status: ",applications[0]?.status);
+    // console.log("activeGatePass: ",activeGatePassApp);
 
     const pendingAndUpcomingApps = applications.filter(app => 
         app.status === 'Pending' || 
@@ -142,12 +142,12 @@ const StudentLeaveDashboard = () => {
     );
     
     return (
-        <div className="bg-gray-900 text-white min-h-screen p-4 sm:p-8 font-sans">
+        <div className="bg-gray-100 text-gray-700 min-h-screen p-4 sm:p-8 font-sans">
             <div className="max-w-4xl mx-auto">
-                <header className="mb-8">
+                {/* <header className="mb-8">
                     <h1 className="text-4xl font-bold text-teal-400">Student Leave Portal</h1>
                     <p className="text-gray-400 mt-1">Manage your leave applications and view your gate pass.</p>
-                </header>
+                </header> */}
 
                 {activeGatePassApp && (
                     <section className="mb-10">
@@ -156,9 +156,9 @@ const StudentLeaveDashboard = () => {
                     </section>
                 )}
 
-                <section className="mb-10 bg-gray-800 rounded-lg shadow-lg">
+                <section className="mb-10 bg-gray-100 rounded-lg shadow-lg">
                     <button onClick={() => setIsFormVisible(!isFormVisible)} className="w-full flex justify-between items-center p-4 text-left">
-                        <h2 className="text-xl font-semibold text-gray-200">Apply for New Leave</h2>
+                        <h2 className="text-xl font-semibold text-gray-600">Apply for New Leave</h2>
                         <ChevronDown className={`w-6 h-6 text-gray-400 transition-transform ${isFormVisible ? 'rotate-180' : ''}`} />
                     </button>
                     {isFormVisible && (
@@ -166,19 +166,19 @@ const StudentLeaveDashboard = () => {
                             {/* Form fields... (same as before) */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-400 mb-1">Start Date</label>
-                                    <input type="date" {...register('startDate')} className="w-full bg-gray-700 border border-gray-600 rounded-md p-2" />
+                                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-800 mb-1">Start Date</label>
+                                    <input type="date" {...register('startDate')} className="w-full bg-gray-100 border border-gray-600 rounded-md p-2" />
                                     {errors.startDate && <p className="text-red-400 text-xs mt-1">{errors.startDate.message}</p>}
                                 </div>
                                 <div>
-                                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-400 mb-1">End Date</label>
-                                    <input type="date" {...register('endDate')} className="w-full bg-gray-700 border border-gray-600 rounded-md p-2" />
+                                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-800 mb-1">End Date</label>
+                                    <input type="date" {...register('endDate')} className="w-full bg-gray-100 border border-gray-600 rounded-md p-2" />
                                     {errors.endDate && <p className="text-red-400 text-xs mt-1">{errors.endDate.message}</p>}
                                 </div>
                             </div>
                             <div>
-                                <label htmlFor="reason" className="block text-sm font-medium text-gray-400 mb-1">Reason for Leave</label>
-                                <textarea {...register('reason')} rows="4" className="w-full bg-gray-700 border border-gray-600 rounded-md p-2"></textarea>
+                                <label htmlFor="reason" className="block text-sm font-medium text-gray-800 mb-1">Reason for Leave</label>
+                                <textarea {...register('reason')} rows="4" className="w-full bg-gray-100 border border-gray-600 rounded-md p-2"></textarea>
                                 {errors.reason && <p className="text-red-400 text-xs mt-1">{errors.reason.message}</p>}
                             </div>
                             <div className="text-right">
@@ -190,13 +190,13 @@ const StudentLeaveDashboard = () => {
                 
                 {/* --- Pending & Upcoming Section --- */}
                 <section className="mb-10">
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-200 flex items-center gap-2"><Clock className="w-6 h-6 text-teal-400" /> Pending & Upcoming Applications</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-700 flex items-center gap-2"><Clock className="w-6 h-6 text-teal-400" /> Pending & Upcoming Applications</h2>
                     {isLoading ? <p>Loading...</p> : <ApplicationList apps={pendingAndUpcomingApps} />}
                 </section>
 
                 {/* --- History Section --- */}
                 <section>
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-200 flex items-center gap-2"><History className="w-6 h-6 text-teal-400" /> Leave History</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-700 flex items-center gap-2"><History className="w-6 h-6 text-teal-400" /> Leave History</h2>
                     {isLoading ? <p>Loading...</p> : <ApplicationList apps={pastApps} />}
                 </section>
             </div>

@@ -59,17 +59,17 @@ const AdminDashboard = () => {
             </motion.header>
 
             {/* Main Content */}
-            <main className="pt-24 pb-16">
+            <main className="pt-44 pb-16">
                 <div className="container mx-auto px-6">
-                    <AdminHeader title="Managing Dashboard" subtitle="Overview & quick actions" />
+                    {/* <AdminHeader title="Managing Dashboard" subtitle="Overview & quick actions" /> */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {features.map((feature, index) => (
                         <Link to={feature.path} key={index} >
                             <div
-                                className="bg-white rounded-lg p-6 cursor-pointer"
+                                className="bg-gray-100 p-6 border border-gray-600 cursor-pointer"
                             >
                                 <div className="flex items-center justify-between">
-                                    <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
+                                    <div className="p-3 bg-gray-100 text-slate-600 rounded-full">
                                         {feature.icon}
                                     </div>
                                 </div>

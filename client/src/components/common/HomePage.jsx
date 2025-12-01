@@ -40,7 +40,7 @@ const HomePage = () => {
   const LeadershipCard = ({ image, name, title, quote }) => (
     <motion.div 
       whileHover={{ y: -8, scale: 1.02 }}
-      className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center group hover:shadow-2xl transition-all duration-300"
+      className="bg-white rounded-2xl p-6 text-center group transition-all duration-300"
     >
       <div className="relative inline-block mb-4">
         <img src={image} alt={name} className="w-28 h-28 rounded-full mx-auto object-cover border-4 border-white shadow-lg group-hover:border-primary-100 transition-colors" />
@@ -206,7 +206,7 @@ const HomePage = () => {
       <main className="pt-16">
         {/* Enhanced Hero Section */}
         {/* <SectionWrapper id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden" > */}
-          <section id='home' className="relative min-h-screen flex items-center justify-center overflow-hidden">
+          <section id='home' className=" relative min-h-screen flex items-center justify-center overflow-hidden">
   {/* Background with modern gradient overlay */}
   <div className="absolute inset-0 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 z-0" />
   <div 
@@ -287,7 +287,7 @@ const HomePage = () => {
           <img 
             src={heroImageUrl} 
             alt="Modern Hostel Facilities" 
-            className="w-full h-[500px] object-cover" 
+            className="w-150px h-150px object-cover" 
           />
           <div className="absolute inset-0 bg-linear-to-t from-slate-900/30 to-transparent" />
         </div>
@@ -320,7 +320,7 @@ const HomePage = () => {
         {/* </SectionWrapper> */}
 
         {/* Leadership Section */}
-        <SectionWrapper id="leadership" className="bg-white">
+        <SectionWrapper id="leadership" className="bg-black/5">
   <div className="text-center mb-16">
     <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
       Meet Our <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600">Visionary Leaders</span>
@@ -334,7 +334,7 @@ const HomePage = () => {
     {LEADERCARD_DATA.map((leader, index) => (
       <div 
         key={leader.name}
-        className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 overflow-hidden"
+        className="group bg-white rounded-2xl transition-all duration-300 border  overflow-hidden"
       >
         <LeadershipCard {...leader} />
       </div>
@@ -344,17 +344,17 @@ const HomePage = () => {
 
         
         {/* Facilities Section */}
-        <SectionWrapper id="facilities" className="bg-linear-to-br from-gray-50 to-blue-50">
+        <SectionWrapper id="facilities" className="bg-linear-to-br from-gray-100 to-gray-200">
           <Facilities />
         </SectionWrapper>
 
         {/* Fees Section */}
-        <SectionWrapper id="fees" className="bg-amber-100">
+        <SectionWrapper id="fees" className="bg-linear-to-br from-blue-50 to-indigo-50">
           <FEES />
         </SectionWrapper>
 
         {/* Mess Section */}
-        <SectionWrapper id="mess" className="bg-linear-to-br from-orange-50 to-amber-50">
+        <SectionWrapper id="mess" className="bg-linear-to-br from-orange-100 to-gray-100">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -470,12 +470,12 @@ const HomePage = () => {
         </SectionWrapper>
 
         {/* Gallery Section */}
-        <SectionWrapper id="gallery" className="bg-emerald-100">
+        <SectionWrapper id="gallery" className="bg-gray-100">
           <GallerySection />
         </SectionWrapper>
 
         {/* Contact Section */}
-        <SectionWrapper id="contact" className="bg-linear-to-br from-gray-900 to-blue-900 text-white">
+        <SectionWrapper id="contact" className="bg-linear-to-br from-gray-900 to-indigo-200 text-white">
            <Contact />
         </SectionWrapper>
       </main>

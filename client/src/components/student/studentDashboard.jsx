@@ -1,15 +1,11 @@
 // StudentDashboard.js
-import { useState } from 'react';
 import {  FiBell, FiFileText, FiMessageSquare, FiCalendar, FiDollarSign, FiCheckCircle } from 'react-icons/fi';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../redux/authSlicer';
+import { motion,} from 'framer-motion';
+import { useSelector, } from 'react-redux';
 import { Link } from 'react-router';
 
 const StudentDashboard = () => {
-    const [isProfileOpen, setProfileOpen] = useState(false);
     const  {isAuthenticated, user, loading }  = useSelector(state => state.auth);
-    const dispatch = useDispatch();
 
     // console.log("user: ",user);
     const features = [
@@ -20,11 +16,6 @@ const StudentDashboard = () => {
         { name: 'Attendance', icon: <FiCheckCircle className="text-4xl" />, description: 'View your attendance record.', path: "/student/attendance" },
         { name: 'Circulars', icon: <FiBell className="text-4xl" />, description: 'Check the latest notices and announcements.', path: "/student/circulars" },
     ];
-    // this api call for checking authentication of user 
-    
-    const handleLogOut = () => {
-        dispatch(logout());
-    }
 
     // loading when api call 
     if(loading) {
@@ -37,7 +28,7 @@ const StudentDashboard = () => {
 
 
     return (
-        <div className="bg-gray-100 min-h-screen font-sans">
+        <div className="bg-gray-200 min-h-screen font-sans">
             {/* Header */}
             <motion.header
                 initial={{ y: -100 }}
@@ -53,37 +44,31 @@ const StudentDashboard = () => {
                             <p className="text-sm text-gray-500">Duhai, Muradnagar, Ghaziabad, (U.P.) </p>
                         </div>
                     </div>
+
+                    {/* profile section */}
                     <div className="relative">
                        <div className="flex items-center space-x-4">
-                           <FiBell className="text-gray-600 h-6 w-6 cursor-pointer hover:text-teal-600 transition-colors"/>
-                            <img
-                                src={user.profileURL}
-                                alt="Student Profile"
-                                className="h-12 w-12 rounded-full cursor-pointer border-2 border-transparent hover:border-teal-500"
-                                onClick={() => setProfileOpen(!isProfileOpen)}
-                            />
+                            <Link to="/student/profile">
+                                <img
+                                    src={user.profileURL}
+                                    alt="Student Profile"
+                                    className="h-12 w-12 rounded-full cursor-pointer border-2 border-transparent hover:border-teal-500"
+                                />
+                            </Link>
                         </div>
-                        <AnimatePresence>
-                            {isProfileOpen && (
-                                <div className="w-4 absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 text-center">
-                                    <button onClick={handleLogOut} className='text-center cursor-pointer w-2'>Logout</button> 
-                                </div>
-                            )}
-                        </AnimatePresence>
                     </div>
                 </div>
             </motion.header>
 
             {/* Main Content */}
-            <main className="pt-24 pb-16">
+            <main className="pt-44 pb-16">
                 <div className="container mx-auto px-6">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-8">Welcome, { user.name}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {features.map((feature, index) => (
                         <Link to={feature.path} key={index} >
-                            <div className="bg-white rounded-lg p-6 cursor-pointer">
+                            <div className="bg-white rounded-lg p-6 cursor-pointer border hover:shadow-lg transition-shadow">
                                <div className="flex items-center justify-between">
-                                    <div className="p-3 bg-teal-100 text-teal-600 rounded-full">
+                                    <div className="p-3 bg-slate-100 text-gray-600 rounded-full">
                                         {feature.icon}
                                     </div>
                                 </div>
@@ -97,8 +82,8 @@ const StudentDashboard = () => {
             </main>
 
             {/* Footer */}
-            <footer className="bg-white py-4 bottom-0 left-0 w-full border-t">
-                <div className="container mx-auto px-6 text-center text-gray-600">
+            <footer className="bg-blue-900 py-4 left-0 w-full border-t mt-15">
+                <div className="container mx-auto px-6 text-center text-gray-100">
                     &copy; {new Date().getFullYear()} HRIT UNIVERSITY. All Rights Reserved.
                 </div>
             </footer>

@@ -162,8 +162,6 @@ const StudentFees = () => {
   if (studentData) {
     return (
       <div className="bg-slate-50 min-h-screen p-4 sm:p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome, {studentData.userName}!</h1>
-        <p className="text-gray-600 mb-8">Here is your fee summary and payment history.</p>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <Card className="bg-linear-to-r from-sky-600 to-cyan-500 text-white">

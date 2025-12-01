@@ -190,9 +190,10 @@ const forgotPassword = async (req, res) => {
         console.log("user: debugging ",user);
 
         // 2. Find and delete any existing token for this user
-        let token = await Token.findOne({ _id: user._id });
+        let token = await Token.findOne({ userId: user._id });
+        console.log("token: debugging ",token);
         if (token) {
-            await token.deleteOne();
+            await Token.findOneAndDelete({ _id: token._id });
         }
 
         console.log("user: ",user);
@@ -226,14 +227,17 @@ const forgotPassword = async (req, res) => {
 // Reset Password function 
 const resetPassword = async (req, res) => {
     try {
-        const { password } = req.body;
+        console.log("Reset Password invoked with params:", req.params);
+        console.log("Request body:", req.body);
+        const { newPassword } = req.body;
         
         // 1. Find the user and the token
-        const user = await User.findById(req.params.userId);
+        const user = await User.findById({_id: req.params.userId});
         if (!user) {
             return res.status(400).send("Invalid link or user does not exist.");
         }
 
+        console.log("Found user:", user);
         const token = await Token.findOne({
             userId: user._id,
             token: req.params.token,
@@ -243,7 +247,9 @@ const resetPassword = async (req, res) => {
             return res.status(400).send("Invalid link or token has expired.");
         }
 
+        console.log("Found valid token:", token);
         // 2. Hash the new password
+        const password = newPassword;
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -255,6 +261,7 @@ const resetPassword = async (req, res) => {
         await token.deleteOne();
 
         res.status(200).send("Password has been reset successfully.");
+        console.log("Password reset successful for user:", user.emailId);
 
     } catch (error) {
         console.error(error);

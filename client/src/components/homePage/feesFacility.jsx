@@ -30,7 +30,7 @@ const FEES = ( ) => {
                           whileInView={{ opacity: 1, y: 0 }}
                           viewport={{ once: true }}
                           transition={{ delay: index * 0.2 }}
-                          className={`relative rounded-2xl p-8 border-2 transition-all duration-300 border-gray-200 bg-white shadow-lg hover:shadow-xl`}
+                          className={`relative rounded-2xl p-8 border-2 transition-all duration-300 border-gray-400 bg-gray-200 shadow-lg hover:shadow-xl`}
                         >
                           
                           <h3 className="text-2xl font-bold text-gray-900 mb-4">{tier.type}</h3>

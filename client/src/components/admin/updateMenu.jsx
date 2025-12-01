@@ -64,7 +64,6 @@ const UpdateMenu = () => {
 
 	return (
 		<div className="bg-slate-50 min-h-screen p-4 sm:p-8">
-			<AdminHeader title="Update Menu" subtitle="Add or update menu items by day and meal" />
 			<div className="max-w-3xl mx-auto space-y-6">
 				<form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow admin-card space-y-4">
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">

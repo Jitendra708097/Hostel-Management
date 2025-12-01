@@ -19,7 +19,13 @@ userRouter.get('/check', userMiddleware, (req, res) => {
     console.log('Backend Authentication check for user:', req.user);
     res.status(200).json({ 
         message: 'User is authenticated', 
-        user: {emailId:req.user.emailId, userName:req.user.userName, _id:req.user._id, profileURL: req.user.profileURL,role:req.user.role} 
+        user: {emailId:req.user.emailId, 
+            userName:req.user.userName, 
+            _id:req.user._id, 
+            profileURL: req.user.profileURL,
+            roomNo: req.user.roomNo,
+            phoneNo: req.user.phoneNo,
+            role:req.user.role} 
     });
 }
 ); // Check authentication status

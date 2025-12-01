@@ -3,10 +3,10 @@ import { Link, useNavigate, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { School, LogIn, Mail, Lock, Eye, EyeOff, CheckCircle, Info } from 'lucide-react'; // Added CheckCircle, Info
+import { School, LogIn, Mail, Lock, Eye, EyeOff, CheckCircle, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../../redux/authSlicer';
+import { loginUser } from '../../redux/authSlicer'; 
 import axiosClient from '../../config/axiosClient';
 
 // Schemas for different forms
@@ -25,41 +25,29 @@ const forgotPasswordSchema = z.object({
     .email('Invalid email format'),
 });
 
-const resetPasswordSchema = z.object({
-  newPassword: z.string().min(5, 'New password is required').max(10, 'Password must be at least 6 characters'),
-  confirmPassword: z.string().min(5, 'Confirm password is required'),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
 const AdminLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [viewState, setViewState] = useState('login'); // 'login', 'forgotPassword', 'linkSent', 'resetPassword', 'passwordChanged'
-  const [passwordResetToken, setPasswordResetToken] = useState(null); // To store token from URL
+  const [viewState, setViewState] = useState('login');
+  const [passwordResetToken, setPasswordResetToken] = useState(null);
+  const [apiMessage, setApiMessage] = useState({ type: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticate, loading, error } = useSelector(state => state.auth);
 
-  // Reverted to original image URL
   const hostelImageUrl = "https://tse3.mm.bing.net/th/id/OIP.urH91B0nX8NDU8y5SYw3qgAAAA?rs=1&pid=ImgDetMain&o=7&rm=3";
 
   // Form hooks for different sections
   const loginForm = useForm({ resolver: zodResolver(loginSchema) });
   const forgotPasswordForm = useForm({ resolver: zodResolver(forgotPasswordSchema) });
-  const resetPasswordForm = useForm({ resolver: zodResolver(resetPasswordSchema) });
 
+  // Clear API messages when changing views
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const token = queryParams.get('token');
-    if (token) {
-      setPasswordResetToken(token);
-      setViewState('resetPassword');
-    }
+    setApiMessage({ type: '', message: '' });
   }, [viewState]);
 
   const onLoginSubmit = async (data) => {
@@ -67,19 +55,27 @@ const AdminLoginPage = () => {
   }
 
   const onForgotPasswordSubmit = async (data) => {
-    // Simulate API call to send reset link
-    console.log("Sending password reset link to:", data);
-    const response = await axiosClient.post('/user/forgot-password',data);
-    console.log("Response: ", response.data);
-    setViewState('linkSent');
-    forgotPasswordForm.reset();
-  };
-
-  const onResetPasswordSubmit = async (data) => {
-    // Simulate API call to reset password
-    console.log("Resetting password with token:", passwordResetToken, "and new password:", data.newPassword);
-    setViewState('passwordChanged');
-    resetPasswordForm.reset();
+    setIsSubmitting(true);
+    setApiMessage({ type: '', message: '' });
+    
+    try {
+      const response = await axiosClient.post('/user/forgot-password', data);
+      console.log("Response: ", response.data);
+      setViewState('linkSent');
+      forgotPasswordForm.reset();
+      setApiMessage({ 
+        type: 'success', 
+        message: response.data?.message || 'Password reset link sent successfully!' 
+      });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      setApiMessage({ 
+        type: 'error', 
+        message: error.response?.data?.message || 'Failed to send reset link. Please try again.' 
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const containerVariants = {
@@ -107,20 +103,20 @@ const AdminLoginPage = () => {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="flex items-center justify-center min-h-screen bg-gray-900" // Original background
+      className="flex items-center justify-center min-h-screen bg-gray-900"
     >
-      <div className="flex w-full max-w-4xl h-screen md:h-auto md:max-h-[700px] bg-white/90 rounded-lg shadow-2xl backdrop-blur-lg overflow-hidden border border-gray-200/50"> {/* Original card styles */}
+      <div className="flex w-full max-w-4xl h-screen md:h-auto md:max-h-[700px] bg-white/90 rounded-lg shadow-2xl backdrop-blur-lg overflow-hidden border border-gray-200/50">
         {/* Image Panel */}
         <motion.div
           variants={itemVariants}
           className="hidden md:block w-1/2 bg-cover bg-center relative overflow-hidden"
           style={{ backgroundImage: `url(${hostelImageUrl})` }}
         >
-          <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/20 to-black/60"> {/* Original gradient */}
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/20 to-black/60">
             <div className="flex items-end h-full p-8">
               <motion.h1
                 variants={itemVariants}
-                className="text-3xl font-bold text-white leading-tight" // Original text style
+                className="text-3xl font-bold text-white leading-tight"
               >
                 A vibrant community awaits. Welcome back.
               </motion.h1>
@@ -129,21 +125,39 @@ const AdminLoginPage = () => {
         </motion.div>
 
         {/* Form Panel */}
-        <div className="w-full md:w-1/2 p-6 sm:p-10 flex flex-col justify-center relative"> {/* Original form panel styles */}
+        <div className="w-full md:w-1/2 p-6 sm:p-10 flex flex-col justify-center relative">
           <motion.div variants={itemVariants} className="text-center mb-8">
             <Link to="/" className="inline-block md:hidden">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="p-3 bg-primary-100 rounded-full" // Original school icon styling
+                className="p-3 bg-primary-100 rounded-full"
               >
-                <School size={48} className="text-primary-600" /> {/* Original school icon styling */}
+                <School size={48} className="text-primary-600" />
               </motion.div>
             </Link>
-            <h2 className="mt-6 text-3xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-primary-600 to-purple-600"> {/* Original title styling */}
+            <h2 className="mt-6 text-3xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-primary-600 to-purple-600">
               Welcome to RSD Hostel
             </h2>
           </motion.div>
+
+          {/* API Message Display */}
+          <AnimatePresence>
+            {apiMessage.message && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className={`p-3 rounded-lg mb-4 text-center ${
+                  apiMessage.type === 'error' 
+                    ? 'bg-red-100 text-red-700 border border-red-300' 
+                    : 'bg-green-100 text-green-700 border border-green-300'
+                }`}
+              >
+                {apiMessage.message}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <AnimatePresence mode="wait">
             {viewState === 'login' && (
@@ -154,19 +168,19 @@ const AdminLoginPage = () => {
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
                 onSubmit={loginForm.handleSubmit(onLoginSubmit)}
-                className="space-y-6" // Original spacing
+                className="space-y-6"
               >
                 {/* Email Input */}
-                <motion.div variants={itemVariants} className="space-y-1"> {/* Original spacing */}
+                <motion.div variants={itemVariants} className="space-y-1">
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" /> {/* Original icon positioning */}
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input
                       type="email"
                       {...loginForm.register('email')}
                       className={`block w-full pl-10 pr-4 py-3 border rounded-lg outline-none transition-all duration-300
                         ${loginForm.formState.errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white/50'}
                         focus:ring-2 focus:ring-primary-500/30
-                        text-gray-900`} // Original input styles
+                        text-gray-900`}
                       placeholder="Enter your email"
                     />
                   </div>
@@ -174,7 +188,7 @@ const AdminLoginPage = () => {
                     <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-xs text-red-500 ml-1" // Original error message style
+                      className="text-xs text-red-500 ml-1"
                     >
                       {loginForm.formState.errors.email.message}
                     </motion.p>
@@ -182,22 +196,22 @@ const AdminLoginPage = () => {
                 </motion.div>
 
                 {/* Password Input */}
-                <motion.div variants={itemVariants} className="space-y-1"> {/* Original spacing */}
+                <motion.div variants={itemVariants} className="space-y-1">
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" /> {/* Original icon positioning */}
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input
                       type={showPassword ? "text" : "password"}
                       {...loginForm.register('password')}
                       className={`block w-full pl-10 pr-12 py-3 border rounded-lg outline-none transition-all duration-300
                         ${loginForm.formState.errors.password ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white/50'}
                         focus:ring-2 focus:ring-primary-500/30
-                        text-gray-900`} // Original input styles
+                        text-gray-900`}
                       placeholder="Enter your password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none" // Original eye button style
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
                     >
                       {showPassword ? (
                         <EyeOff className="h-5 w-5" />
@@ -210,32 +224,35 @@ const AdminLoginPage = () => {
                     <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-xs text-red-500 ml-1" // Original error message style
+                      className="text-xs text-red-500 ml-1"
                     >
                       {loginForm.formState.errors.password.message}
                     </motion.p>
                   )}
                 </motion.div>
 
+                {/* forget password link */}
                 <motion.div variants={itemVariants} className="text-right text-sm">
                   <button
                     type="button"
                     onClick={() => setViewState('forgotPassword')}
-                    className="text-primary-600 hover:text-primary-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 rounded-md p-1" // Original link color
+                    className="cursor-pointer text-primary-600 hover:text-primary-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 rounded-md p-1"
                   >
                     Forgot Password?
                   </button>
                 </motion.div>
-
+                {/* Sign in Button */}
                 <motion.div variants={itemVariants}>
                   <motion.button
                     type="submit"
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    className={`cursor-pointer w-full flex justify-center items-center py-3 px-4 rounded-lg bg-blue-100 text-blue-400 font-medium transition-all duration-300 shadow-lg hover:shadow-primary-500/25`} // Original button style
+                    className={`cursor-pointer w-full flex justify-center items-center py-3 px-4 rounded-lg bg-blue-100 text-blue-400 font-medium transition-all duration-300 shadow-lg hover:shadow-primary-500/25 ${
+                      loading ? 'opacity-70 cursor-not-allowed' : ''
+                    }`}
                     disabled={loading}
                   >
-                    <span className={`flex items-center gap-2`}>
+                    <span className="flex items-center gap-2">
                       {loading ? (
                         <>
                           <svg className="animate-spin h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -256,12 +273,24 @@ const AdminLoginPage = () => {
                     <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-xs text-red-500 mt-3 text-center" // Original error message style
+                      className="text-xs text-red-500 mt-3 text-center"
                     >
                       {error?.error}
                     </motion.p>
                   )}
                 </motion.div>
+
+                 {/* Register Link */}
+                <motion.div variants={itemVariants} className="text-center text-sm">
+                  <span className="text-gray-600">Don't have an account? </span>
+                  <Link
+                    to="/register"  
+                    className="text-blue-800 hover:text-primary-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 rounded-md p-1"
+                  >
+                    Register Here
+                  </Link>
+                </motion.div>
+
               </motion.form>
             )}
 
@@ -272,23 +301,23 @@ const AdminLoginPage = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-6" // Original spacing
+                className="space-y-6"
               >
                 <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Reset Your Password</h3>
                 <p className="text-gray-600 text-center mb-6">
                   Enter your email address and we'll send you a link to reset your password.
                 </p>
                 <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)} className="space-y-6">
-                  <motion.div variants={itemVariants} className="space-y-1"> {/* Original spacing */}
+                  <motion.div variants={itemVariants} className="space-y-1">
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                       <input
                         type="email"
                         {...forgotPasswordForm.register('email')}
-                        className={`block w-full pl-10 pr-4 py-3 border rounded-lg outline-none transition-all duration-300 bg-amber-600
-                          ${forgotPasswordForm.formState.errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-400'}
+                        className={`block w-full pl-10 pr-4 py-3 border rounded-lg outline-none transition-all duration-300
+                          ${forgotPasswordForm.formState.errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white/50'}
                           focus:ring-2 focus:ring-primary-500/30
-                          text-gray-900`} // Original input styles
+                          text-gray-900`}
                         placeholder="Enter your email"
                       />
                     </div>
@@ -296,7 +325,7 @@ const AdminLoginPage = () => {
                       <motion.p
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-xs text-red-500 ml-1" // Original error message style
+                        className="text-xs text-red-500 ml-1"
                       >
                         {forgotPasswordForm.formState.errors.email.message}
                       </motion.p>
@@ -309,11 +338,11 @@ const AdminLoginPage = () => {
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                       className={`w-full flex justify-center items-center py-3 px-4 rounded-lg text-white font-medium transition-all duration-300 shadow-lg bg-green-500 hover:bg-green-600
-                                 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`} // New button style with green for reset
-                      disabled={loading}
+                                 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      disabled={isSubmitting}
                     >
-                      <span className={`flex items-center gap-2`}>
-                        {loading ? (
+                      <span className="flex items-center gap-2">
+                        {isSubmitting ? (
                           <>
                             <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -334,7 +363,7 @@ const AdminLoginPage = () => {
                     <button
                       type="button"
                       onClick={() => setViewState('login')}
-                      className="text-primary-600 hover:text-primary-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 rounded-md p-1" // Original link color
+                      className="text-primary-600 hover:text-primary-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 rounded-md p-1"
                     >
                       Back to Login
                     </button>
@@ -350,10 +379,10 @@ const AdminLoginPage = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-6 text-center p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-800" // Styled message box
+                className="space-y-6 text-center p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-800"
               >
                 <div className="flex justify-center mb-4">
-                  <Mail size={64} className="text-blue-500" /> {/* Mail icon for link sent */}
+                  <Mail size={64} className="text-blue-500" />
                 </div>
                 <h3 className="text-2xl font-bold">Password Reset Link Sent!</h3>
                 <p className="px-4">
@@ -363,7 +392,7 @@ const AdminLoginPage = () => {
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                   onClick={() => setViewState('login')}
-                  className="mt-6 w-full flex justify-center items-center py-3 px-4 rounded-lg text-blue-400 font-medium transition-all duration-300 shadow-lg hover:shadow-primary-500/25" // Original button style
+                  className="mt-6 w-full flex justify-center items-center py-3 px-4 rounded-lg text-blue-400 font-medium transition-all duration-300 shadow-lg hover:shadow-primary-500/25"
                 >
                   <LogIn className="h-5 w-5 mr-2" /> Back to Login
                 </motion.button>
@@ -377,7 +406,7 @@ const AdminLoginPage = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-6" // Original spacing
+                className="space-y-6"
               >
                 <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Set New Password</h3>
                 <p className="text-gray-600 text-center mb-6">
@@ -385,13 +414,14 @@ const AdminLoginPage = () => {
                 </p>
                 <form onSubmit={resetPasswordForm.handleSubmit(onResetPasswordSubmit)} className="space-y-6">
                   {passwordResetToken && (
-                     <div className="flex items-center gap-2 p-3 text-sm rounded-lg bg-yellow-100 text-yellow-800 border border-yellow-300"> {/* Info message for token */}
+                     <div className="flex items-center gap-2 p-3 text-sm rounded-lg bg-yellow-100 text-yellow-800 border border-yellow-300">
                         <Info size={18} />
-                        <span className="truncate">Using reset token: {passwordResetToken.substring(0,10)}...</span>
+                        <span className="truncate">Reset token detected</span>
                      </div>
                   )}
+                  
                   {/* New Password Input */}
-                  <motion.div variants={itemVariants} className="space-y-1"> {/* Original spacing */}
+                  <motion.div variants={itemVariants} className="space-y-1">
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                       <input
@@ -400,7 +430,7 @@ const AdminLoginPage = () => {
                         className={`block w-full pl-10 pr-12 py-3 border rounded-lg outline-none transition-all duration-300
                           ${resetPasswordForm.formState.errors.newPassword ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white/50'}
                           focus:ring-2 focus:ring-primary-500/30
-                          text-gray-900`} // Original input styles
+                          text-gray-900`}
                         placeholder="Enter new password"
                       />
                       <button
@@ -427,7 +457,7 @@ const AdminLoginPage = () => {
                   </motion.div>
 
                   {/* Confirm Password Input */}
-                  <motion.div variants={itemVariants} className="space-y-1"> {/* Original spacing */}
+                  <motion.div variants={itemVariants} className="space-y-1">
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                       <input
@@ -436,7 +466,7 @@ const AdminLoginPage = () => {
                         className={`block w-full pl-10 pr-12 py-3 border rounded-lg outline-none transition-all duration-300
                           ${resetPasswordForm.formState.errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white/50'}
                           focus:ring-2 focus:ring-primary-500/30
-                          text-gray-900`} // Original input styles
+                          text-gray-900`}
                         placeholder="Confirm new password"
                       />
                       <button
@@ -468,11 +498,11 @@ const AdminLoginPage = () => {
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                       className={`w-full flex justify-center items-center py-3 px-4 rounded-lg text-white font-medium transition-all duration-300 shadow-lg bg-green-500 hover:bg-green-600
-                                 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`} // New button style with green for reset
-                      disabled={loading}
+                                 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      disabled={isSubmitting}
                     >
-                      <span className={`flex items-center gap-2`}>
-                        {loading ? (
+                      <span className="flex items-center gap-2">
+                        {isSubmitting ? (
                           <>
                             <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -500,10 +530,10 @@ const AdminLoginPage = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-6 text-center p-4 rounded-lg bg-green-50 border border-green-200 text-green-800" // Styled message box
+                className="space-y-6 text-center p-4 rounded-lg bg-green-50 border border-green-200 text-green-800"
               >
                 <div className="flex justify-center mb-4">
-                  <CheckCircle size={64} className="text-green-500" /> {/* CheckCircle icon for success */}
+                  <CheckCircle size={64} className="text-green-500" />
                 </div>
                 <h3 className="text-2xl font-bold">Password Changed Successfully!</h3>
                 <p className="px-4">
@@ -513,7 +543,7 @@ const AdminLoginPage = () => {
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                   onClick={() => setViewState('login')}
-                  className="mt-6 w-full flex justify-center items-center py-3 px-4 rounded-lg text-blue-400 font-medium transition-all duration-300 shadow-lg hover:shadow-primary-500/25" // Original button style
+                  className="mt-6 w-full flex justify-center items-center py-3 px-4 rounded-lg text-blue-400 font-medium transition-all duration-300 shadow-lg hover:shadow-primary-500/25"
                 >
                   <LogIn className="h-5 w-5 mr-2" /> Go to Login
                 </motion.button>
@@ -523,7 +553,7 @@ const AdminLoginPage = () => {
         </div>
       </div>
 
-      {/* Decorative Background Elements (Original styles maintained) */}
+      {/* Decorative Background Elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <motion.div
           initial={{ opacity: 0 }}

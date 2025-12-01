@@ -159,6 +159,7 @@ const StudentGrievance = () => {
                 </div>
               </div>
             )}
+            
             {/* Comments Section */}
             <div className="mt-8">
                 <h3 className="font-semibold text-lg text-gray-800 mb-4">Conversation Log</h3>
@@ -187,8 +188,12 @@ const StudentGrievance = () => {
               &larr; Cancel
             </button>
             <h2 className="cursor-pointer text-2xl font-bold text-gray-800 mb-6">File a New Grievance</h2>
+
+            {/* Grievance Form */}
             <form onSubmit={handleSubmitGrievance}>
               <div className="space-y-6">
+
+                {/* Select Category of Grievance */}
                 <div>
                   <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category</label>
                   <select id="category" name="category" value={formData.category} onChange={handleFormChange} className="cursor-pointer mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
@@ -198,23 +203,34 @@ const StudentGrievance = () => {
                     <option>Security</option>
                     <option>Inter-student Conflict</option>
                     <option>Staff Issues</option>
+                    <option>Washing Machine</option>
+                    <option>Internet/WiFi</option>
+                    <option>Geyser</option>
                     <option>Other</option>
                   </select>
                 </div>
+
+                {/* Description Field */}
                 <div>
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
                   <textarea id="description" name="description" rows="4" value={formData.description} onChange={handleFormChange} required className="p-4 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                   <p className="mt-2 text-sm text-gray-500">Please be as detailed as possible.</p>
                 </div>
+
+                {/* File Attachments and Anonymous Checkbox */}
                 <div>
                     <label htmlFor="attachments" className="block text-sm font-medium text-gray-700">Attachments (Optional)</label>
                     <input type="file" id="attachments" name="attachments" multiple onChange={handleFileChange} className="cursor-pointer mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
                 </div>
+
+                {/* Submit Anonymously Checkbox */}
                 <div className="flex items-center">
                   <input id="isAnonymous" name="isAnonymous" type="checkbox" checked={formData.isAnonymous} onChange={handleFormChange} className="cursor-pointer h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
                   <label htmlFor="isAnonymous" className="ml-2 block text-sm text-gray-900">Submit Anonymously</label>
                 </div>
               </div>
+
+              {/* loading button  */}
               <div className="mt-8">
                 <button type="submit" disabled={loading} className="cursor-pointer w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300">
                   {loading ? 'Submitting...' : 'Submit Grievance'}

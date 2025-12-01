@@ -22,8 +22,10 @@ import StudentFees from './src/components/student/studentFees';
 import AdminFeesDashboard from './src/components/admin/adminFeesDashboard';
 import AdminDashboard from './src/components/admin/adminDashboard';
 import StudentDashboard from './src/components/student/studentDashboard';
+import ProfileView from './src/components/student/ProfileView';
 import StudentManager from './src/components/admin/studentManager';
 import UpdateMenu from './src/components/admin/updateMenu';
+import ResetPasswordPage from './src/components/common/reset-password';
 
 const App = () => {
 
@@ -44,11 +46,7 @@ const App = () => {
         )
     }
 
-    // --- Internal Helper Functions (to keep Route elements readable) ---
-
-    /**
-     * Determines the redirection path for an authenticated user trying to access a public page.
-     */
+    // 3. Determine Redirect Path for Authenticated Users
     const getAuthenticatedRedirectPath = () => {
         if (!isAuthenticated || !user) return null;
         if (user.role === "student") return "/student/dashboard";
@@ -57,12 +55,6 @@ const App = () => {
     };
     const authenticatedRedirectPath = getAuthenticatedRedirectPath();
 
-    /**
-     * Renders the protected component or redirects if the role check fails.
-     * @param {string} roleRequired - The role needed ('student' or 'admin').
-     * @param {React.Component} Component - The component to render (or a function returning it).
-     * @param {string} redirectPath - The path to redirect unauthenticated users to.
-     */
     const renderProtectedElement = (roleRequired, Component, redirectPath) => {
         // Ensure user object exists before checking role
         return isAuthenticated && user && user.role === roleRequired 
@@ -78,13 +70,14 @@ const App = () => {
             
             {/* Home Page: Redirects authenticated users */}
             <Route path="/" element={ authenticatedRedirectPath ? <Navigate to={authenticatedRedirectPath} replace /> : <HomePage /> } />
-            <Route path="/login" element={ authenticatedRedirectPath ? <Navigate to={authenticatedRedirectPath} replace /> : <StudentLoginPage />}  />
+            <Route path='/login' element={ authenticatedRedirectPath ? <Navigate to={authenticatedRedirectPath} replace /> : <StudentLoginPage />}  />
             <Route path="/register"  element={ authenticatedRedirectPath ? <Navigate to={authenticatedRedirectPath} replace /> : <RegisterForm /> } />
             <Route path="/admin/login" element={ authenticatedRedirectPath ? <Navigate to={authenticatedRedirectPath} replace /> : <AdminLoginPage />}  />
 
 
         
             <Route path="/student/dashboard"  element={renderProtectedElement("student", StudentDashboard, "/login")}  />
+            <Route path="/student/profile" element={renderProtectedElement("student", ProfileView, "/login")} />
             <Route path="/student/attendance" element={renderProtectedElement("student", StudentAttendenceRecords, "/login")} />
             <Route path='/student/weekly-menu' element={renderProtectedElement("student", WeeklyMenuPage, "/login")} />
             <Route path="/student/grievance" element={renderProtectedElement("student", StudentGrievance, "/login")} />
@@ -103,6 +96,7 @@ const App = () => {
             <Route path="/admin/update-menu" element={renderProtectedElement("admin", UpdateMenu, "/admin/login")} />
 
             {/* Catch-all for 404 Not Found (Optional) */}
+           <Route path='/reset-password/:token/:userId?' element={<ResetPasswordPage />} />
             <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
     );

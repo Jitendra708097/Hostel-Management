@@ -35,7 +35,7 @@ const GallerySection = () => {
   ];
 
   return (
-    <section className="py-16 bg-linear-to-br from-slate-50 to-blue-50/30">
+    <section className="py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -61,7 +61,7 @@ const GallerySection = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               whileHover={{ y: -4 }}
-              className="group relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-slate-100"
+              className="group relative bg-white shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-slate-400"
             >
               <div className="relative overflow-hidden">
                 <img 
@@ -69,19 +69,6 @@ const GallerySection = () => {
                   alt={item.title} 
                   className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
-                
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 via-slate-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
-                {/* Content Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <h3 className="text-white font-semibold text-lg mb-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-slate-200 text-sm mb-4 line-clamp-2">
-                    {item.description}
-                  </p>
-                </div>
               </div>
               
               {/* Always visible title */}

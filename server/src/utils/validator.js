@@ -31,7 +31,7 @@ const validatorFunction = async (data) => {
         return { valid: false, message: 'Password must be contains minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1' };
     }   
     if (data.userName.length < 3 || data.userName.length > 20) {
-        return { valid: false, message: 'Student name must be between 3 and 20 characters.' };
+        return { valid: false, message: 'Student name must be between 3 and 25 characters.' };
     }
     if (data.year < 1 || data.year > 4) {
         return { valid: false, message: 'Year must be between 1 and 4.' };

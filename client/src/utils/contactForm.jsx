@@ -65,7 +65,7 @@ const Contact = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
             {isSuccess ? (
               <div className="flex flex-col items-center justify-center h-full">
                 <CheckCircle className="w-16 h-16 text-green-400 mb-4" />

@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         min: 3,
-        max: 20
+        max: 25
     },
     emailId: {
         type: String,
@@ -42,6 +42,19 @@ const userSchema = new mongoose.Schema({
     profileURL: {
         type: String,
         default: 'https://i.pinimg.com/736x/98/1d/6b/981d6b2e0ccb5e968a0618c8d47671da.jpg'
+    },
+    roomNo: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 300
+    },
+    phoneNo: {
+        type: Number,
+        required: true,
+        unique: true,
+        min: 1000000000,
+        max: 9999999999
     },
     public_id: {
         type: String
