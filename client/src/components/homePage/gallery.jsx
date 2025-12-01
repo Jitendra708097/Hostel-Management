@@ -1,8 +1,8 @@
-import room1 from "../../assests/room1.png";
-import room2 from "../../assests/room2.png";
-import room3 from "../../assests/room3.png";
-import room4 from "../../assests/room4.png";
-import hostelGallary from "../../assests/hostelGallary.png";
+import room1 from "../../assests/room1.jpg";
+import room2 from "../../assests/room2.jpg";
+import room3 from "../../assests/room3.jpg";
+import room4 from "../../assests/room4.jpg";
+import hostelGallary from "../../assests/hostelGallary.jpg";
 import { motion } from "framer-motion";
 
 const GallerySection = () => {

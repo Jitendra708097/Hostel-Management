@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import heroImageUrl from '../../assests/hostelPhoto.png';
+import heroImageUrl from '../../assests/hostelPhoto.jpg';
 import universityLogo from '../../assests/hritlogo2.jpg';
 import { Link } from 'react-router';
 import axiosClient from '../../config/axiosClient';
