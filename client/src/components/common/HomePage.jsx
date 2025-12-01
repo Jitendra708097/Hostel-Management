@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import heroImageUrl from '../../assests/hostelPhoto.jpg';
-import universityLogo from '../../assests/hritlogo2.jpg';
 import { Link } from 'react-router';
 import axiosClient from '../../config/axiosClient';
 import { LogIn, UserPlus, Utensils, MapPin, Star, Wifi, Shield, Dumbbell, Users } from 'lucide-react';
@@ -86,7 +84,7 @@ const HomePage = () => {
         <div className="flex items-center gap-3">
           <div className="relative">
             <img 
-              src={universityLogo} 
+              src='https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606074/hritlogo2_qi3sqv.jpg' 
               alt="HRIT" 
               className="h-12 w-12 rounded-xl object-cover shadow-sm border border-gray-200" 
             />
@@ -211,11 +209,11 @@ const HomePage = () => {
   <div className="absolute inset-0 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 z-0" />
   <div 
     className="absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-overlay opacity-20"
-    style={{ backgroundImage: `url(${heroImageUrl})` }}
+    style={{ backgroundImage: `url(https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606074/hostelPhoto_y8m1yl.jpg)` }}
   />
   
   {/* Subtle grid pattern */}
-  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
+  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size:64px_64px] mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
   
   <div className="relative z-10 container mx-auto px-6 py-20">
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -285,7 +283,7 @@ const HomePage = () => {
       <div className="relative">
         <div className="relative rounded-2xl overflow-hidden shadow-2xl">
           <img 
-            src={heroImageUrl} 
+            src='https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606074/hostelPhoto_y8m1yl.jpg' 
             alt="Modern Hostel Facilities" 
             className="w-150px h-150px object-cover" 
           />

@@ -1,34 +1,30 @@
-import room1 from "../../assests/room1.jpg";
-import room2 from "../../assests/room2.jpg";
-import room3 from "../../assests/room3.jpg";
-import room4 from "../../assests/room4.jpg";
-import hostelGallary from "../../assests/hostelGallary.jpg";
+
 import { motion } from "framer-motion";
 
 const GallerySection = () => {
   const galleryItems = [
     {
-      src: room1,
+      src: 'https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606074/room3_rusyhr.jpg',
       title: "Premium Single Room",
       description: "Spacious single room with study desk and natural lighting"
     },
     {
-      src: room2,
+      src: 'https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606074/room1_zvj8yx.jpg',
       title: "Comfortable Double Room",
       description: "Shared room perfect for students with modern amenities"
     },
     {
-      src: room3,
+      src: 'https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606074/room2_hkgiph.jpg',
       title: "Study Lounge",
       description: "Quiet study area with high-speed internet and comfortable seating"
     },
     {
-      src: room4,
+      src: 'https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606073/hostelGallary_jmdvsb.jpg',
       title: "Recreational Space",
       description: "Common area for relaxation and social activities"
     },
     {
-      src: hostelGallary,
+      src: 'https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606561/room4_yrbhmk.jpg',
       title: "Campus Overview",
       description: "Beautiful view of our hostel campus and surroundings"
     }

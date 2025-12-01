@@ -1,5 +1,4 @@
 import { FaLinkedin, FaFacebook, FaTwitterSquare, FaInstagramSquare } from 'react-icons/fa';
-import universityLogo from '../../assests/hritlogo2.jpg';
 import { ArrowRight,Mail,Phone } from 'lucide-react';
 import { Link } from'react-router';
 
@@ -12,7 +11,7 @@ const Footer = () => {
             {/* Brand */}
             <div className="lg:col-span-1">
               <div className="flex items-center gap-3 mb-6">
-                <img src={universityLogo} alt="HRIT" className="h-12 w-12 rounded-xl" />
+                <img src='https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606074/hritlogo2_qi3sqv.jpg' alt="HRIT" className="h-12 w-12 rounded-xl" />
                 <div>
                   <div className="font-bold text-lg">RSD Hostel</div>
                   <div className="text-sm text-gray-400">HRIT University</div>

@@ -1,7 +1,4 @@
 import { Wifi, WashingMachine, Dumbbell, ShieldCheck, Coffee, Utensils, BriefcaseMedical, Cctv, Power } from 'lucide-react';
-import chancellorImg from './src/assests/chancellor.jpg';
-import Hosteldirector from './src/assests/abhay-yadav.jpeg';
-import vcImg from './src/assests/dk-sharma.jpeg';
 
 
 export const COURSES = [
@@ -16,9 +13,6 @@ export const COURSES = [
   'Mathematics',
   'Architecture'
 ];
-
-
-
 
 export const DUMMY_FACILITIES = [
   { name: 'High-Speed Wi-Fi', icon: Wifi },
@@ -74,19 +68,19 @@ export const MESS_TIMINGS = [
 
 export const LEADERCARD_DATA = [
     {
-      image: chancellorImg,
+      image: 'https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606073/chancellor_ulu89h.jpg',
       name: "Dr. Anil Aggarwal",
       title: "Hon'ble Chancellor Ex Member of Parliament (R.S.) ",
       quote: "At HRIT University, we believe in shaping the future of our youth. As Franklin D. Roosevelt said, “We cannot always build the future for our youth, but we can build our youth for the future.” That’s why we are committed to providing a holistic education that equips our students with the knowledge, skills, and values needed to thrive in today’s competitive landscape."
     },
     {
-      image: vcImg,
+      image: 'https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606073/dk-sharma_vwiday.jpg',
       name: "Prof. (Dr.) Devendra Kumar Sharma",
       title: "Vice-Chancellor",
       quote: "The higher education is that which does not merely give us information, but makes our life in harmony with our existence"
     },
     {
-      image: Hosteldirector,
+      image: 'https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606075/abhay-yadav_ogome6.jpg',
       name: "Adv. Abhay Yadav",
       title: "Hostel Director(RSD)",
       quote: "Ensuring a smooth, efficient, and supportive administrative framework for all our students and staff."

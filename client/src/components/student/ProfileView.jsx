@@ -104,9 +104,9 @@ const ProfileView = () => {
                     <div className="w-36 h-36 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">No Photo</div>
                   )}
                 </div>
-                <div className="w-full">
+                {/* <div className="w-full">
                   <ProfilePhotoUploader name="profilePhoto" control={control} setError={setError} />
-                </div>
+                </div> */}
               </div>
 
               <div className="col-span-2">

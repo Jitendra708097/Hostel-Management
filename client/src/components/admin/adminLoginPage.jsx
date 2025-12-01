@@ -7,7 +7,6 @@ import { School, LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react'; // Remove
 import { motion } from 'framer-motion'; // Removed AnimatePresence as it's not used directly here
 import { useDispatch, useSelector } from 'react-redux';
 import { adminLoginUser } from '../../redux/authSlicer';
-import hostelImageUrl from '../../assests/hostel1.jpg';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email format'),
@@ -68,7 +67,7 @@ const AdminLoginPage = () => {
         <motion.div
           variants={itemVariants}
           className="hidden md:block w-1/2 bg-cover bg-center relative overflow-hidden"
-          style={{ backgroundImage: `url(${hostelImageUrl})` }}
+          style={{ backgroundImage: `url('https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606073/hostel1_xnr1k3.jpg')` }}
         >
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent flex items-end h-full p-8"> {/* Enhanced gradient */}
             <motion.h1
