@@ -3,12 +3,13 @@ const cloudinary = require('../config/cloudinary'); // Cloudinary configuration
 const Circular = require('../models/circular'); // Mongoose model for storing media info
 const bufferToStream = require('../utils/bufferToStream');
 
-// Upload media file to Cloudinary and store info in MongoDB
+// Upload media file to Cloudinary and store info in MongoDB 
+// Accepts file in req.file (from Multer) and metadata in req.body.
 const uploadCircular =  async (req, res) => {
 
     try {
 
-        const file = req.file;
+        const file = req.file; 
         if (!file) {
             return res.status(400).json({ message: 'No file uploaded.' });
         }
@@ -23,8 +24,6 @@ const uploadCircular =  async (req, res) => {
         const uploadOptions = {
             folder: 'Hostel_Management/Circulars', // Optional: Folder in Cloudinary
             resource_type: req.file.mimetype.startsWith('video/') ? 'video' : 'auto', // Auto-detect or specify
-            // Add any other Cloudinary upload options here
-            // e.g., quality: 'auto:low', eager: [{ width: 400, height: 300, crop: 'pad' }]
         };
         const result = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
@@ -35,18 +34,10 @@ const uploadCircular =  async (req, res) => {
         });
 
         // Store in MongoDB
-        const newMedia = new Circular({
-            public_id: result.public_id,
-            circularURL: result.secure_url,
-            title,
-            description
-        });
+        const newMedia = new Circular({ public_id: result.public_id, circularURL: result.secure_url, title, description});
         await newMedia.save();
-        res.status(200).json({
-            message: 'File uploaded successfully!',
-            circularURL: result.secure_url,
-            public_id: result.public_id,
-        }); 
+
+        res.status(200).json({ message: 'File uploaded successfully!', circularURL: result.secure_url, public_id: result.public_id, }); 
     }
     catch (error) {
         console.error('Cloudinary upload error:', error);
@@ -54,7 +45,7 @@ const uploadCircular =  async (req, res) => {
     }
 }
 
-// Get all media files, sorted by newest first
+// Get all media files from MongoDB 
 const getAllCirculars = async (req, res) => {
     try {
         const mediaFiles = await Circular.find().sort({ createdAt: -1 }); // Sort by newest first 
@@ -70,7 +61,7 @@ const getAllCirculars = async (req, res) => {
     }
 };
 
-// Delete media file from Cloudinary and MongoDB
+// Delete media file from Cloudinary and MongoDB by ID
 const deleteCircularById = async (req, res) => {
 
     const  media_id  = req.params._id; // Get media_id from URL params

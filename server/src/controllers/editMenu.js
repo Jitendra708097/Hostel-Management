@@ -16,6 +16,7 @@ const getMenu = async(req,res) => {
     }
 }
 
+// it will fetch the menu of selected day to the student
 const fetchMenuOfSelectedDay = async (req,res) => {
     try{
 
@@ -50,10 +51,8 @@ const addMenu = async(req,res) => {
     }
 }
 
-// it will update existing menu item this component for admin
+// it will update the menu item of the menu these routes for admin 
 const updateMenu = async (req, res) => {
-
-    console.log("menu: ",req.body);
     try {
         const { day, meal, itemName } = req.body;
         if (!day || !meal || !itemName) {
@@ -62,7 +61,6 @@ const updateMenu = async (req, res) => {
 
         // Find the menu for the given day
         let menu = await Menu.findOne({days: day });
-        console.log("Found menu: ",menu);
         if (!menu) {
             // If no menu for this day, create a new one
             menu = new Menu({
@@ -79,16 +77,12 @@ const updateMenu = async (req, res) => {
         if (mealIndex !== -1) {
             // Update the itemName for this meal
            const res =  menu.mealAndItem[mealIndex].itemName = itemName;
-           console.log("Update Result: ",res);
         } else {
-            // Add new meal and itemName
-            console.log("Adding new meal and item");
             const res = menu.mealAndItem.push({ meal, itemName });
         }
-        // console.log("Menu before saving: ",menu);
-        // const Check = await res.save();
+        
+
         res.status(200).json({ message: 'Menu updated successfully', menu });
-        console.log("Updated Menu: ",Check);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

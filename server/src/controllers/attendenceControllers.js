@@ -3,8 +3,10 @@ const AttendanceRecord = require('../models/attendenceSchema');
 const User = require('../models/User');
 
 
-// it will store the students record on attendence document in Database
-// the one document for one day to all students
+// This component is for warden to mark attendence of students
+//  * The key change here is to use a single atomic update operation with upsert.
+//  * This ensures that we either create a new record for today or update the existing one
+//  * without needing to fetch and merge data manually, reducing the risk of race conditions.
 const markAttendence =  async (req, res) => {
     const { presentStudentIds } = req.body;
     console.log("Hii0")
@@ -45,10 +47,10 @@ const markAttendence =  async (req, res) => {
 };
 
  
-//  * This logic is largely the same, as it compares the final list of "present" students
-//  * against the master student list to find the absentees.
-//  and also once warden click on final submit button then they can't the
-//  attendence of any student. 
+// This component is for warden to final submit the attendence of students
+// and get the list of absent students
+//  * The key change here is to efficiently determine absent students by comparing
+//  * the list of all students against those marked present in the attendance record. 
 const attendenceFinalSubmit =  async (req, res) => {
   try {
     const today = getTodayDate();
@@ -79,7 +81,8 @@ const attendenceFinalSubmit =  async (req, res) => {
 };
 
 
-// from this component each student can view their attendence records 
+// This component for student to get their attendence records of last 30 days 
+// with status present, absent or pending. 
 const getStudentAttendenceRecords =  async (req, res) => {
   
   try {
@@ -125,8 +128,8 @@ const getStudentAttendenceRecords =  async (req, res) => {
 };
 
 
-// This component for warden attendence session in which student will show with their
-// their phot,useName,course,year and warden will mark attendence on UI wheather present or absent
+// This component is for warden to get the list of all students
+// when initializing the attendence session.
 const getStudents = async (req,res) => {
   
   try {
