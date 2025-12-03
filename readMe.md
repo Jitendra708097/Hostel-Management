@@ -1,51 +1,103 @@
 
-what is features implemented on server side
-1.leave
-2.menu
-3.attendence
-4.circular
-6.user Authentication with middleware for validation both user side.
-5.grievance (ongoing)
+# Hostel Management (HRIT University Hostels)
 
-what features have implemented on client side
-1.homepage
-2.menu both side user and admin 
-3.attendence
-4.circular
-5.leave
-6.Here it is implemented using Redux implemented userAuthentication for both user and admin.
+This repository contains a full-stack Hostel Management application for HRIT University (student hostels). It includes a React + Vite front-end and a Node.js + Express back-end with MongoDB for persistence and Redis for session/cache-related usage.
 
+This project provides features for students and admins:
 
-In this Our project techStack is: 
+- Student features (client):
+	- Registration and login (react-hook-form + Zod validation)
+	- View and update profile (photo upload via Cloudinary)
+	- View weekly mess menu, attendance, fees, leave requests, and circulars
+	- Submit grievances
 
-for serverSide:
-1.Node.js
-2.Express.js
-3.MongoDB (Nosql)
-4.Redis database (In Memory) : it is also known as cache memory basically in this i am using this for user authentication 
-in which we tokens for authentication and it faster database than other traditional database
+- Admin features (server + admin UI):
+	- Manage students (assign/update/delete, fee assignment)
+	- Update weekly mess menu
+	- Publish circulars
+	- View and manage attendance, leaves and grievances
 
-4.Mongoose
+Key implemented server-side modules:
 
-libraries using at server side:
-1.
+- Authentication (JWT + middleware)
+- User & student management
+- Menu management (CRUD for daily meals)
+- Attendance tracking
+- Leave requests and grievance handling
+- Cloudinary integration for media uploads
 
-TechStack for client side.
+Tech stack
 
-1.HTML5 (hyper text markup language).
-2.tailwindCSS
-3.JS(javaScript)
-4.react.js
-5.Bundler: vite
-6.cloudinary for media storage
+- Backend: Node.js, Express, Mongoose (MongoDB)
+- Caching / session: Redis (used for authentication/session tokens)
+- Frontend: React, Vite, Tailwind CSS, Framer Motion
+- Forms & validation: react-hook-form + Zod
+- HTTP client: axios
+- Media: Cloudinary
 
-dependcies on client side
-1.react-redux
-2.react-router
-3.react-hook-form
-4.zod/zodResolver
-5.lucide-icon
-6.react-icons
-7.axios: it is HTTP Api call why using it instead fetch because in fetch we data convert in json explicitly but in axios it done all automatically.
-8.emailJS: for email services
-9.dotenv: it is for store sensitive information so that it can't access by anyone publicly in environmental file.
+Main folders
+
+- `server/` - Express API, controllers, routes, models, middleware
+- `client/` - React app (Vite), components, Redux store, styles
+
+Getting started (development)
+
+1. Clone the repo
+
+```bash
+git clone <repo-url>
+cd Hostel
+```
+
+2. Start the server
+
+```powershell
+cd server
+npm install
+nodemon src/index.js
+```
+
+3. Start the client
+
+```powershell
+cd client
+npm install
+npm run dev
+```
+
+Environment variables
+
+- Create `.env` files for server and client as needed. Important variables include:
+	- `MONGO_URI` — MongoDB connection string
+	- `CLOUDINARY_*` — cloudinary credentials
+	- `REDIS_URL` — redis connection
+	- `JWT_SECRET` — jwt signing secret
+	- `VITE_API_URL` — API base URL for the client
+
+API notes
+
+- The server exposes REST endpoints under `/user`, `/menu`, `/fees`, `/attendance`, etc. Some admin routes require an admin token and are protected by middleware.
+
+Deployed app
+
+- Deployed link: 13.233.230.164
+
+Replace the placeholder above with your actual deployed URL.
+
+Contributing
+
+- Please open an issue or submit a PR for bug fixes and features.
+
+Known issues & TODO
+
+- Grievance workflow improvements (some parts are in-progress)
+- Additional tests and CI
+- Improve accessibility and mobile responsiveness across all pages
+
+License
+
+- Add your preferred license here.
+
+Contact
+
+- For questions or help, contact the project owner.
