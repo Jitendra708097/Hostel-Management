@@ -80,7 +80,7 @@ API notes
 
 Deployed app
 
-- Deployed link: 13.233.230.164
+Deployed Web Application IP: 123.456.789.0
 
 Replace the placeholder above with your actual deployed URL.
 
