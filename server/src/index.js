@@ -4,8 +4,8 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const app = express();
 const connectToDatabase = require('./config/mongoDB');
-const menuRouter = require('./routes/menuRouter');
-const rulesRouter = require('./routes/rules');
+const menuRouter = require('./routes/menuRoutes');
+const rulesRouter = require('./routes/rulesRoutes');
 const registrationRouter = require('./routes/registrationFormRoutes');
 const mediaRouter = require('./routes/circularRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -25,6 +25,7 @@ const allowedOrigins = [
   "http://13.233.230.164"       // Your AWS Production IP
 ];
 
+// CORS configuration 
 app.use(cors({
     origin: (origin, callback) => {
         // Allow requests with no origin (like mobile apps or curl requests)

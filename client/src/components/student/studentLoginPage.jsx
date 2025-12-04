@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router';
+import { Link } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { School, LogIn, Mail, Lock, Eye, EyeOff, CheckCircle, Info } from 'lucide-react';
+import { School, LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../redux/authSlicer'; 
@@ -12,31 +12,26 @@ import axiosClient from '../../config/axiosClient';
 // Schemas for different forms
 const loginSchema = z.object({
   email: z.string()
-    .min(1, 'Email is required')
+    .min(1, 'Enter your email')
     .email('Invalid email format'),
   password: z.string()
-    .min(1, 'Password is required')
-    .min(6, 'Password must be at least 6 characters')
+    .min(1, 'Enter your password')
+    .min(6, 'Password must be at least 6 characters, lowercase, uppercase, number and special characters'),
 });
 
 const forgotPasswordSchema = z.object({
   email: z.string()
-    .min(1, 'Email is required')
+    .min(1, 'Enter your email')
     .email('Invalid email format'),
 });
 
 const AdminLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [viewState, setViewState] = useState('login');
-  const [passwordResetToken, setPasswordResetToken] = useState(null);
   const [apiMessage, setApiMessage] = useState({ type: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { isAuthenticate, loading, error } = useSelector(state => state.auth);
 
   const hostelImageUrl = "https://tse3.mm.bing.net/th/id/OIP.urH91B0nX8NDU8y5SYw3qgAAAA?rs=1&pid=ImgDetMain&o=7&rm=3";
@@ -50,6 +45,8 @@ const AdminLoginPage = () => {
     setApiMessage({ type: '', message: '' });
   }, [viewState]);
 
+
+  // Handlers for form submissions 
   const onLoginSubmit = async (data) => {
     dispatch(loginUser(data));
   }
@@ -395,157 +392,6 @@ const AdminLoginPage = () => {
                   className="mt-6 w-full flex justify-center items-center py-3 px-4 rounded-lg text-blue-400 font-medium transition-all duration-300 shadow-lg hover:shadow-primary-500/25"
                 >
                   <LogIn className="h-5 w-5 mr-2" /> Back to Login
-                </motion.button>
-              </motion.div>
-            )}
-
-            {viewState === 'resetPassword' && (
-              <motion.div
-                key="resetPasswordForm"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
-                <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Set New Password</h3>
-                <p className="text-gray-600 text-center mb-6">
-                  Please enter your new password below.
-                </p>
-                <form onSubmit={resetPasswordForm.handleSubmit(onResetPasswordSubmit)} className="space-y-6">
-                  {passwordResetToken && (
-                     <div className="flex items-center gap-2 p-3 text-sm rounded-lg bg-yellow-100 text-yellow-800 border border-yellow-300">
-                        <Info size={18} />
-                        <span className="truncate">Reset token detected</span>
-                     </div>
-                  )}
-                  
-                  {/* New Password Input */}
-                  <motion.div variants={itemVariants} className="space-y-1">
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                      <input
-                        type={showNewPassword ? "text" : "password"}
-                        {...resetPasswordForm.register('newPassword')}
-                        className={`block w-full pl-10 pr-12 py-3 border rounded-lg outline-none transition-all duration-300
-                          ${resetPasswordForm.formState.errors.newPassword ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white/50'}
-                          focus:ring-2 focus:ring-primary-500/30
-                          text-gray-900`}
-                        placeholder="Enter new password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
-                      >
-                        {showNewPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </button>
-                    </div>
-                    {resetPasswordForm.formState.errors.newPassword && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-xs text-red-500 ml-1"
-                      >
-                        {resetPasswordForm.formState.errors.newPassword.message}
-                      </motion.p>
-                    )}
-                  </motion.div>
-
-                  {/* Confirm Password Input */}
-                  <motion.div variants={itemVariants} className="space-y-1">
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        {...resetPasswordForm.register('confirmPassword')}
-                        className={`block w-full pl-10 pr-12 py-3 border rounded-lg outline-none transition-all duration-300
-                          ${resetPasswordForm.formState.errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white/50'}
-                          focus:ring-2 focus:ring-primary-500/30
-                          text-gray-900`}
-                        placeholder="Confirm new password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </button>
-                    </div>
-                    {resetPasswordForm.formState.errors.confirmPassword && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-xs text-red-500 ml-1"
-                      >
-                        {resetPasswordForm.formState.errors.confirmPassword.message}
-                      </motion.p>
-                    )}
-                  </motion.div>
-
-                  <motion.div variants={itemVariants}>
-                    <motion.button
-                      type="submit"
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
-                      className={`w-full flex justify-center items-center py-3 px-4 rounded-lg text-white font-medium transition-all duration-300 shadow-lg bg-green-500 hover:bg-green-600
-                                 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
-                      disabled={isSubmitting}
-                    >
-                      <span className="flex items-center gap-2">
-                        {isSubmitting ? (
-                          <>
-                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Setting Password...
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="h-5 w-5" />
-                            Reset Password
-                          </>
-                        )}
-                      </span>
-                    </motion.button>
-                  </motion.div>
-                </form>
-              </motion.div>
-            )}
-
-            {viewState === 'passwordChanged' && (
-              <motion.div
-                key="passwordChangedMessage"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6 text-center p-4 rounded-lg bg-green-50 border border-green-200 text-green-800"
-              >
-                <div className="flex justify-center mb-4">
-                  <CheckCircle size={64} className="text-green-500" />
-                </div>
-                <h3 className="text-2xl font-bold">Password Changed Successfully!</h3>
-                <p className="px-4">
-                  Your password has been updated. You can now log in with your new password.
-                </p>
-                <motion.button
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  onClick={() => setViewState('login')}
-                  className="mt-6 w-full flex justify-center items-center py-3 px-4 rounded-lg text-blue-400 font-medium transition-all duration-300 shadow-lg hover:shadow-primary-500/25"
-                >
-                  <LogIn className="h-5 w-5 mr-2" /> Go to Login
                 </motion.button>
               </motion.div>
             )}

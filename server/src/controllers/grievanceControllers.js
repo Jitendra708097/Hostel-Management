@@ -1,4 +1,4 @@
-const Grievance = require('../models/grievance');
+const Grievance = require('../models/grievanceSchema');
 const bufferToStream = require('../utils/bufferToStream');
 const cloudinary = require('../config/cloudinary');
 

@@ -29,14 +29,13 @@ const StudentGrievance = () => {
   const [files, setFiles] = useState([]);
   const { user } = useSelector((state) => state.auth);
 
-  // --- DATA FETCHING ---
+
   // useCallback is used to memoize the function, preventing re-creation on every render
+  // fetch grievances from server 
   const fetchGrievances = useCallback(async () => {
     try {
       setLoading(true);
-      console.log("user: ",user);
       const response = await axiosClient.get(`/grievance/get/${user?._id}`);
-      console.log("grievance: ",response.data.data);
       setGrievances(response.data.data);
       setError('');
     } catch (err) {
@@ -54,7 +53,7 @@ const StudentGrievance = () => {
     }
   }, [view, fetchGrievances]);
 
-  // --- HANDLERS ---
+  // Handlers for various actions 
   const handleViewDetails = (grievance) => {
     setCurrentGrievance(grievance);
     setView('detail');
@@ -114,7 +113,6 @@ const StudentGrievance = () => {
   };
 
 
-  // --- RENDER LOGIC ---
   // Helper function to render the current view based on the state
   const renderContent = () => {
     if (loading && !currentGrievance) {

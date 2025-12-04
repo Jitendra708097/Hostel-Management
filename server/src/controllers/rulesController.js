@@ -1,5 +1,5 @@
 
-const rules = require('../models/rules');
+const rules = require('../models/rulesSchema');
 
 
 const getRules = async(req, res) => {

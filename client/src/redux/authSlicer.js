@@ -4,12 +4,12 @@ import axioClient from '../config/axiosClient';
 
 // register user your self 
 export const registerUser = createAsyncThunk(
-  'auth/registerUser',
+  'auth/registerUser', 
   async (formData, {rejectWithValue}) => {
     try {
       const response = await axioClient.post('/user/register', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'multipart/form-data', // Set the content type to multipart/form-data for file upload
         },
       });
       
@@ -51,9 +51,7 @@ export const checkAuthStatus = createAsyncThunk(
   'auth/checkAuthStatus',
   async (__, {rejectWithValue}) => {
     try {
-      console.log("Authentication status...");
       const { data } = await axioClient.get('/user/check');
-      console.log("Auth status response:", data);
       return data.user;
     } catch (error) {
       if( error.response?.status === 401){

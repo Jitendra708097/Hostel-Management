@@ -1,5 +1,5 @@
 const express = require('express');
-const {getMenu, addMenu, updateMenu, fetchMenuOfSelectedDay} = require('../controllers/editMenu');
+const {getMenu, addMenu, updateMenu, fetchMenuOfSelectedDay} = require('../controllers/menuControllers');
 const menuRouter = express.Router();
 const userMiddleware = require('../middleware/userMiddleware');
 const adminMiddleware = require('../middleware/adminMiddleware');

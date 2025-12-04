@@ -5,16 +5,16 @@ import { useEffect } from 'react';
 import { checkAuthStatus } from './src/redux/authSlicer';
 
 // Page Components
-import HomePage from './src/components/common/HomePage';
+import HomePage from './src/components/homePage/HomePage';
 import AdminLoginPage from './src/components/admin/adminLoginPage';
-import WeeklyMenuPage from './src/components/student/WeeklyMenuPage';
+import WeeklyMenuPage from './src/components/student/studentMenuPage';
 import RegisterForm from './src/components/student/studentRegister';
 import StudentLoginPage from './src/components/student/studentLoginPage';
-import AttendanceDashboard from './src/components/admin/attendanceDashboard';
-import StudentAttendenceRecords from './src/components/student/attendanceRecords';
+import AttendanceDashboard from './src/components/admin/adminAttendanceDashboard';
+import StudentAttendenceRecords from './src/components/student/studentAttendanceRecords';
 import CircularsPage from './src/components/common/circularPage';
-import Leave from './src/components/admin/leave';
-import Leavepage from './src/components/student/leaveRequests';
+import Leave from './src/components/admin/adminLeave';
+import Leavepage from './src/components/student/studentLeave';
 import LoadingSpinner from './src/utils/loadingSpinner';
 import StudentGrievance from './src/components/student/studentGrievance';
 import WardenGrievance from './src/components/admin/adminGrievance';
@@ -22,9 +22,9 @@ import StudentFees from './src/components/student/studentFees';
 import AdminFeesDashboard from './src/components/admin/adminFeesDashboard';
 import AdminDashboard from './src/components/admin/adminDashboard';
 import StudentDashboard from './src/components/student/studentDashboard';
-import ProfileView from './src/components/student/ProfileView';
-import StudentManager from './src/components/admin/studentManager';
-import UpdateMenu from './src/components/admin/updateMenu';
+import ProfileView from './src/components/student/studentProfileView';
+import StudentManager from './src/components/admin/adminStudentManager';
+import UpdateMenu from './src/components/admin/adminUpdateMenu';
 import ResetPasswordPage from './src/components/common/reset-password';
 
 const App = () => {

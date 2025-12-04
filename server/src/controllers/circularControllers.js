@@ -1,6 +1,6 @@
 
 const cloudinary = require('../config/cloudinary'); // Cloudinary configuration
-const Circular = require('../models/circular'); // Mongoose model for storing media info
+const Circular = require('../models/circularSchema'); // Mongoose model for storing media info
 const bufferToStream = require('../utils/bufferToStream');
 
 // Upload media file to Cloudinary and store info in MongoDB 

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const redisClient = require('../config/redis');
-const User = require('../models/User');
+const User = require('../models/UserSchema');
 
 const adminMiddleware = async (req, res, next) => {
     console.log("Admin middleware is invoked.");

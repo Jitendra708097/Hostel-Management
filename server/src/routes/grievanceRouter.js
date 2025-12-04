@@ -1,6 +1,6 @@
 const express = require('express');
 const grievanceRouter = express.Router();
-const upload = require('../middleware/upload');
+const upload = require('../middleware/uploadMiddleware');
 const userMiddleware = require('../middleware/userMiddleware');
 const { grievanceSubmitted, getAllGrievances, getGrievanceById, updateGrievanceStatus, addComment, getGrievanceDetails, getMyGrievances } = require('../controllers/grievanceControllers');
 const adminMiddleware = require('../middleware/adminMiddleware');

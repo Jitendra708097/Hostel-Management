@@ -28,7 +28,7 @@ const registerSchema = z.object({
   phoneNo: z.number().min(1000000000, 'Phone No. must be at least 10 digits').max(9999999999, 'Phone No. must be at most 10 digits'),
 });
 
-// --- MAIN REGISTRATION FORM COMPONENT ---
+// Register Form Component
 const RegisterForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const SAVED_FORM_KEY = 'studentRegisterForm_v1';

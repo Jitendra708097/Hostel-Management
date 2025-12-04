@@ -1,6 +1,6 @@
-const FeeStructure = require('../models/feeStructureModel');
-const User = require('../models/User');
-const Payment = require('../models/paymentModel');
+const FeeStructure = require('../models/feeStructureSchema');
+const User = require('../models/UserSchema');
+const Payment = require('../models/paymentSchema');
 const crypto = require('crypto');
 const razorpay = require('../config/razorpay');
 

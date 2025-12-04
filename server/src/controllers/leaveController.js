@@ -1,4 +1,4 @@
-const LeaveApplication = require('../models/leaveRequest'); 
+const LeaveApplication = require('../models/leaveSchema'); 
 
 // Request made by student for wardens approval 
 const leaveRequestByStudent =async (req, res) => {

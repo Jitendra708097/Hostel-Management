@@ -1,4 +1,3 @@
-// StudentDashboard.js
 import {  FiBell, FiFileText, FiMessageSquare, FiCalendar, FiDollarSign, FiCheckCircle } from 'react-icons/fi';
 import { motion,} from 'framer-motion';
 import { useSelector, } from 'react-redux';
@@ -7,7 +6,7 @@ import { Link } from 'react-router';
 const StudentDashboard = () => {
     const  {isAuthenticated, user, loading }  = useSelector(state => state.auth);
 
-    // console.log("user: ",user);
+    // routes for different features on dashboard with icons and descriptions 
     const features = [
         { name: 'Mess Menu', icon: <FiCalendar className="text-4xl" />, description: 'View the weekly mess menu.', path: '/student/weekly-menu' },
         { name: 'Leave Application', icon: <FiFileText className="text-4xl" />, description: 'Apply for out-of-campus leave.', path: '/student/leave-request' },

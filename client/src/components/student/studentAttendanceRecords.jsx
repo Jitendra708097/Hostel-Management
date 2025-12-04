@@ -9,6 +9,8 @@ const StudentAttendanceRecords = () => {
   const [error, setError] = useState('');
   const { user } = useSelector((state) => state.auth);
 
+  // Fetch attendance data on component mount and when currentDate changes or user changes
+  // Attendance data structure: { '2024-06-01': 'present', '2024-06-02': 'absent', ... }
   useEffect(() => {
     const fetchAttendance = async () => {
       setIsLoading(true);
@@ -40,6 +42,7 @@ const StudentAttendanceRecords = () => {
   const totalMarked = monthlyEntries.length;
   const unknownDays = Math.max(0, daysInMonth - totalMarked);
 
+  // Determine CSS class for each day based on attendance status
   const getDayClass = (dateKey) => {
     const status = attendanceData[dateKey];
     if (status === 'present') return 'bg-green-500 text-white';
@@ -52,6 +55,7 @@ const StudentAttendanceRecords = () => {
       <div className="max-w-4xl mx-auto bg-gray-200 p-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">My Attendance</h1>
 
+        
         <div className="flex items-center gap-4 mb-4">
           <div className="flex items-center gap-2"><span className="inline-block w-4 h-4 rounded-sm bg-green-500" /><span className="text-sm text-gray-800">Present</span></div>
           <div className="flex items-center gap-2"><span className="inline-block w-4 h-4 rounded-sm bg-red-500" /><span className="text-sm text-gray-800">Absent</span></div>

@@ -1,10 +1,9 @@
-import { useEffect } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import axiosClient from '../../config/axiosClient';
-import ProfilePhotoUploader from '../../components/common/ProfilePhotoUploader';
+import ProfilePhotoUploader from '../common/ProfilePhotoUploader';
 import { checkAuthStatus, logout } from '../../redux/authSlicer';
 import { motion } from 'framer-motion';
 
@@ -74,6 +73,7 @@ const ProfileView = () => {
     }
   };
 
+  // handle logout
   const handleLogout = async () => {
     try {
       await dispatch(logout()).unwrap();
@@ -82,6 +82,7 @@ const ProfileView = () => {
     }
     navigate('/login');
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -104,9 +105,6 @@ const ProfileView = () => {
                     <div className="w-36 h-36 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">No Photo</div>
                   )}
                 </div>
-                {/* <div className="w-full">
-                  <ProfilePhotoUploader name="profilePhoto" control={control} setError={setError} />
-                </div> */}
               </div>
 
               <div className="col-span-2">
@@ -131,6 +129,8 @@ const ProfileView = () => {
                     <label className="block text-sm font-medium text-gray-700">Course</label>
                     <input {...register('course')} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
                   </div>
+
+                  {/* select year */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Year</label>
                     <select {...register('year')} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
@@ -141,6 +141,8 @@ const ProfileView = () => {
                       <option value="4">4</option>
                     </select>
                   </div>
+
+                  {/* Institution  */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Institution</label>
                     <select {...register('institution')} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm">

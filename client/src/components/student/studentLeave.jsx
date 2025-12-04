@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { format, isBefore, parseISO, startOfToday } from 'date-fns';
 import { ChevronDown, Send, CheckCircle, XCircle, Clock, Paperclip, History } from 'lucide-react';
 import axiosClient from "../../config/axiosClient";
-// import { user } from '../../redux/authSlicer';
 import { useSelector } from 'react-redux';
 
 
@@ -51,7 +50,7 @@ const StatusPill = ({ status }) => {
     return (<span className={`flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full ${styles[status]}`}><Icon className="w-4 h-4" />{status}</span>);
 };
 
-// --- Main Student Component ---
+// Main Component
 const StudentLeaveDashboard = () => {
     const [applications, setApplications] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -63,7 +62,6 @@ const StudentLeaveDashboard = () => {
         resolver: zodResolver(leaveSchema),
     });
 
-    console.log("user: ",user);
     
     // this fetch leave data from database for checking status of leave 
     useEffect(() => {
@@ -81,6 +79,7 @@ const StudentLeaveDashboard = () => {
         fetchApplications();
     }, []);
 
+    // form submission handler 
     const onSubmit = async (data) => {
         try {
             const response = await axiosClient.post(`/leave/request/${user?._id}`,data);
@@ -94,7 +93,7 @@ const StudentLeaveDashboard = () => {
         }
     };
 
-    // --- LOGIC FOR HISTORY & ACTIVE GATE PASS ---
+    // logic to categorize applications and get active gate pass
     const today = startOfToday();
     const activeGatePassApp = applications.find(app => 
         app.status === 'Approved' && 
@@ -103,11 +102,6 @@ const StudentLeaveDashboard = () => {
         // isBefore(today, parseISO(app.endDate)) // Leave has not ended
     );
 
-    // console.log("Applications: ",applications);
-    // console.log("startDate: ",applications[0]?.startDate);
-    // console.log("today: ",today);
-    // console.log("Status: ",applications[0]?.status);
-    // console.log("activeGatePass: ",activeGatePassApp);
 
     const pendingAndUpcomingApps = applications.filter(app => 
         app.status === 'Pending' || 

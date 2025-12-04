@@ -1,7 +1,7 @@
 // routes/mediaRoutes.js
 const express = require('express');
 const circularRouter = express.Router();
-const upload = require('../middleware/upload'); // Your Multer middleware
+const upload = require('../middleware/uploadMiddleware'); // Your Multer middleware
 const { uploadCircular, getAllCirculars, getCircularById, deleteCircularById, updateCircularById } = require('../controllers/circularControllers');
 const userMiddleware = require('../middleware/userMiddleware');
 const adminMiddleware = require('../middleware/adminMiddleware');

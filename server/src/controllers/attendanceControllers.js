@@ -1,6 +1,6 @@
 const getTodayDate = require('../utils/getTodayDate');
 const AttendanceRecord = require('../models/attendanceSchema');
-const User = require('../models/User');
+const User = require('../models/UserSchema');
 
 
 // This component is for warden to mark attendance of students

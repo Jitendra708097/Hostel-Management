@@ -5,10 +5,10 @@ import axiosClient from '../../config/axiosClient';
 import { LogIn, UserPlus, Utensils, MapPin, Star, Wifi, Shield, Dumbbell, Users } from 'lucide-react';
 import {  MESS_TIMINGS, LEADERCARD_DATA } from '../../../constants';
 import Contact from '../../utils/contactForm';
-import Facilities from '../../components/homePage/facilities';
-import FEES from '../../components/homePage/feesFacility';
-import GallerySection from '../../components/homePage/gallery';
-import Footer from '../../components/homePage/footer';
+import Facilities from './facilities';
+import FEES from './feesFacility';
+import GallerySection from './gallery';
+import Footer from './footer';
 
 
 const HomePage = () => {

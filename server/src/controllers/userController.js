@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const validatorFunction = require('../utils/validator');
-const User = require('../models/User');
-const Token = require('../models/token');
+const User = require('../models/UserSchema');
+const Token = require('../models/tokenSchema');
 const crypto = require('crypto');
 const sendEmail = require('../utils/sendEmail');
 const jwt = require('jsonwebtoken');
@@ -98,6 +98,12 @@ const deleteUserById = async (req, res) => {
     const _id = req.params._id;
     if (!_id) {
         return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    // delete user image from cloudinary
+    const user = await User.findById(_id);
+    if (user && user.public_id) {
+        await cloudinary.uploader.destroy(user.public_id);
     }
 
     await User.findByIdAndDelete(_id);

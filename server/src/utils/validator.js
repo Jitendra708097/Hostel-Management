@@ -1,5 +1,5 @@
 const validator = require('validator');
-const User = require('../models/User');
+const User = require('../models/UserSchema');
 
 // Function to validate email
 

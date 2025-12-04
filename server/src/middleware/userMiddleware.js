@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../models/UserSchema');
 const jwt = require('jsonwebtoken');
 const redisClient = require('../config/redis');
 

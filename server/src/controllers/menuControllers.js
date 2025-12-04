@@ -1,4 +1,4 @@
-const Menu = require('../models/menu');
+const Menu = require('../models/menuSchema');
 
 // it will show whole menu to user
 const getMenu = async(req,res) => {
