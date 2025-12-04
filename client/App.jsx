@@ -10,8 +10,8 @@ import AdminLoginPage from './src/components/admin/adminLoginPage';
 import WeeklyMenuPage from './src/components/student/WeeklyMenuPage';
 import RegisterForm from './src/components/student/studentRegister';
 import StudentLoginPage from './src/components/student/studentLoginPage';
-import AttendanceDashboard from './src/components/admin/attendenceDashboard';
-import StudentAttendenceRecords from './src/components/student/attendenceRecords';
+import AttendanceDashboard from './src/components/admin/attendanceDashboard';
+import StudentAttendenceRecords from './src/components/student/attendanceRecords';
 import CircularsPage from './src/components/common/circularPage';
 import Leave from './src/components/admin/leave';
 import Leavepage from './src/components/student/leaveRequests';
@@ -88,7 +88,7 @@ const App = () => {
            {/* PROTECTED ADMIN ROUTES (Ternary Check)  */}
             <Route path="/admin/dashboard"  element={renderProtectedElement("admin", AdminDashboard, "/admin/login")} />
             <Route path="admin/circulars"  element={renderProtectedElement("admin", () => <CircularsPage isAdmin={true} />, "/admin/login")} />
-            <Route path="/admin/attendence-dashboard"  element={renderProtectedElement("admin", AttendanceDashboard, "/admin/login")}   />
+            <Route path="/admin/attendance-dashboard"  element={renderProtectedElement("admin", AttendanceDashboard, "/admin/login")}   />
             <Route path='/admin/leave'  element={renderProtectedElement("admin", Leave, "/admin/login")}  />
             <Route path="/admin/grievance"  element={renderProtectedElement("admin", WardenGrievance, "/admin/login")} />
             <Route path="/admin/fees"  element={renderProtectedElement("admin", AdminFeesDashboard, "/admin/login")} />

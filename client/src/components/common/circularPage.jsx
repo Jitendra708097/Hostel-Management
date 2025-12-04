@@ -141,6 +141,20 @@ const CircularsPage = ({ isAdmin }) => {
         setModalOpen(true);
     };
 
+    // delete circular function can be added here for admin if needed
+    const deleteCircular = async (circularId) => {
+        // Implement delete functionality if required
+        if (!window.confirm('Are you sure you want to delete this circular?')) return;
+        try {
+            await axiosClient.delete(`/circular/delete/${circularId}`);
+            alert('Circular deleted successfully!');
+            fetchCirculars(); // Refresh the list
+        } catch (err) {
+            alert('Failed to delete circular. Please try again.');
+            console.error(err);
+        }   
+    }
+
     // --- Admin Upload Section Component ---
     const AdminUploadSection = () => (
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
@@ -163,10 +177,6 @@ const CircularsPage = ({ isAdmin }) => {
                              <button type="button" onClick={() => fileInputRef.current.click()} className="flex-1 inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
                                 <Upload className="mr-2" size={20} />
                                 Upload from Storage
-                            </button>
-                            <button type="button" onClick={() => cameraInputRef.current.click()} className="flex-1 inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
-                                <Camera className="mr-2" size={20} />
-                                Use Camera
                             </button>
                         </div>
                     )}
@@ -231,7 +241,12 @@ const CircularsPage = ({ isAdmin }) => {
                                         <td className="px-6 py-4 whitespace-nowrap text-gray-500">{new Date(circular.uploadDate).toLocaleDateString()}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {/* Note: I've changed circular.circularURL to circular.pdfUrl to match the backend schema from previous answers */}
-                                            <button onClick={() => openModal(circular.circularURL)} className="text-indigo-600 cursor-pointer hover:text-indigo-900 font-semibold">View</button>
+                                            <div className="flex items-center gap-4">
+                                                <button onClick={() => openModal(circular.circularURL)} className="text-indigo-600 cursor-pointer hover:text-indigo-900 font-semibold">View</button>
+                                                {isAdmin && (
+                                                    <button onClick={() => deleteCircular(circular._id)} className=" p-1.5 rounded-2xl text-gray-100 cursor-pointer hover:text-red-800 font-semibold bg-red-500">Delete</button>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
