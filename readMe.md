@@ -1,6 +1,10 @@
 
 # Hostel Management (HRIT University Hostels)
 
+Deployed app
+
+Deployed Web Application IP: http://13.233.230.164
+
 This repository contains a full-stack Hostel Management application for HRIT University (student hostels). It includes a React + Vite front-end and a Node.js + Express back-end with MongoDB for persistence and Redis for session/cache-related usage.
 
 This project provides features for students and admins:
@@ -78,9 +82,6 @@ API notes
 
 - The server exposes REST endpoints under `/user`, `/menu`, `/fees`, `/attendance`, etc. Some admin routes require an admin token and are protected by middleware.
 
-Deployed app
-
-- Deployed link: 13.233.230.164
 
 Replace the placeholder above with your actual deployed URL.
 
