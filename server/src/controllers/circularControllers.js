@@ -74,7 +74,6 @@ const deleteCircularById = async (req, res) => {
     if (!mediaItem) {
         return res.status(404).json({ message: 'Media item not found in database.' });
     }
-    console.log('Hello 0', mediaItem)
 
     // Now we have the public_id, proceed to delete
     const public_id = mediaItem.public_id;
@@ -82,12 +81,10 @@ const deleteCircularById = async (req, res) => {
         return res.status(400).json({ message: 'public_id is required.' });
     }
 
-    console.log('Hello 1')
     try 
     {
         // Delete from Cloudinary
         const cloudinaryResult = await cloudinary.uploader.destroy(public_id, {  resource_type: mediaItem.resource_type === 'video' ? 'video' : 'image' });
-        console.log('Cloudinary deletion result:', cloudinaryResult);
         if (cloudinaryResult.result !== 'ok' && cloudinaryResult.result !== 'not found') {
             return res.status(500).json({ message: 'Error deleting file from Cloudinary.', error: cloudinaryResult });
         }

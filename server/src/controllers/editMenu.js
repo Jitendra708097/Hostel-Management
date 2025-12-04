@@ -73,7 +73,6 @@ const updateMenu = async (req, res) => {
 
         // Check if the meal already exists for this day
         const mealIndex = menu.mealAndItem.findIndex(m => m.meal.toLowerCase() === meal.toLowerCase());
-        console.log("Meal Index: ",mealIndex);
         if (mealIndex !== -1) {
             // Update the itemName for this meal
            const res =  menu.mealAndItem[mealIndex].itemName = itemName;

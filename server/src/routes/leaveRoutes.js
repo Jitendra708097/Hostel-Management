@@ -2,7 +2,7 @@ const express = require('express');
 const leaveRouter = express.Router();
 const userMiddleware = require('../middleware/userMiddleware');
 const adminMiddleware = require('../middleware/adminMiddleware');
-const { leaveRequestByStudent, viewLeaveStatus, viewAllLeaveApplicationsByWarden, updateLeaveStatusByWarden } = require('../controllers/leaveContoller');
+const { leaveRequestByStudent, viewLeaveStatus, viewAllLeaveApplicationsByWarden, updateLeaveStatusByWarden } = require('../controllers/leaveController');
 
 // for student only Routes
 leaveRouter.post('/request/:_id',userMiddleware,leaveRequestByStudent);

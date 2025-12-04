@@ -6,8 +6,6 @@ const attendanceRecordSchema = new mongoose.Schema({
     date: {
         type: Date,
         required: true,
-        // When saving, make sure to set time to 00:00:00 UTC for consistent daily records
-        // e.g., new Date(new Date().setHours(0,0,0,0))
         unique: true
     },
     isFinalized: { 
@@ -15,7 +13,7 @@ const attendanceRecordSchema = new mongoose.Schema({
         default: false 
     },
     students: [{
-        _id: false, // there is no need to store id for every sub document
+        _id: false,
         studentId: {
             type: mongoose.Schema.Types.ObjectId,
             ref:'User'
@@ -31,10 +29,9 @@ const attendanceRecordSchema = new mongoose.Schema({
         }
     }]
 }, {
-    timestamps: true // Adds createdAt and updatedAt
+    timestamps: true
 });
 
-// IMPORTANT: Ensures a student can only have ONE attendance record per day
 attendanceRecordSchema.index({ student: 1, date: 1 }, { unique: true });
 
 const AttendanceRecord = mongoose.model('AttendanceRecord', attendanceRecordSchema);

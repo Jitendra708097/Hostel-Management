@@ -6,11 +6,11 @@ const app = express();
 const connectToDatabase = require('./config/mongoDB');
 const menuRouter = require('./routes/menuRouter');
 const rulesRouter = require('./routes/rules');
-const registrationRouter = require('./routes/registrationFromRoutes');
+const registrationRouter = require('./routes/registrationFormRoutes');
 const mediaRouter = require('./routes/circularRoutes');
 const userRouter = require('./routes/userRoutes');
 const redisClient = require('./config/redis');
-const attendenceRouter = require('./routes/attendenceRoutes');
+const attendanceRouter = require('./routes/attendanceRoutes');
 const circularRouter = require('./routes/circularRoutes')
 const leaveRouter = require('./routes/leaveRoutes');
 const grievanceRouter = require('./routes/grievanceRouter');
@@ -33,7 +33,7 @@ app.use('/registration',registrationRouter);
 app.use('/media', mediaRouter); 
 app.use('/user', userRouter); // Assuming you have userRouter defined elsewhere
 app.use('/circular',circularRouter);
-app.use('/attendance',attendenceRouter);
+app.use('/attendance',attendanceRouter);
 app.use('/leave',leaveRouter);
 app.use('/grievance',grievanceRouter);
 app.use('/fees',feeRouter);
