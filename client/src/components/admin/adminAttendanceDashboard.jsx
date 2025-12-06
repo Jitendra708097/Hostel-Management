@@ -29,12 +29,14 @@ const AttendanceDashboard = () => {
     fetchSessionData();
   }, []);
 
+  // this component is for mark attendence.
   const handleTogglePresent = (studentId) => {
     const newSet = new Set(presentStudentIds);
     if (newSet.has(studentId)) newSet.delete(studentId); else newSet.add(studentId);
     setPresentStudentIds(newSet);
   };
 
+  // this component is used for mark attendence in database.
   const handleSync = async () => {
     setIsSyncing(true);
     setError('');
@@ -49,6 +51,8 @@ const AttendanceDashboard = () => {
     }
   };
 
+  // this finalize the attendence and saved permanent in database 
+  // which also create final report of present or absent students.
   const handleFinalize = async () => {
     if (!window.confirm('Are you sure you want to finalize? This will mark all other students as absent.')) return;
     setIsLoading(true);
@@ -65,6 +69,7 @@ const AttendanceDashboard = () => {
     }
   };
 
+  // it shows the all absent students list on admin UI after finalize the attendence.
   if (finalReport) {
     return (
       <div className="p-8 max-w-4xl mx-auto bg-white rounded-lg shadow-lg">

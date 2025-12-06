@@ -7,7 +7,7 @@ import { DollarSign, Users, TrendingUp, AlertCircle, Database } from 'lucide-rea
 import axiosClient from '../../config/axiosClient';
 import AdminHeader from './AdminHeader';
 
-// --- Zod Validation Schema ---
+//  Zod Validation Schema 
 const feeStructureSchema = z.object({
   structureName: z.string().min(3, { message: "Structure name must be at least 3 characters." }),
   description: z.string().optional(),
@@ -15,11 +15,10 @@ const feeStructureSchema = z.object({
     admissionFee: z.coerce.number().min(0).default(0),
     securityDeposit: z.coerce.number().min(0).default(0),
     hostelFee: z.coerce.number().min(1, { message: "Hostel Fee is required." }),
-    // messCharges: z.coerce.number().min(0).default(0),
   })
 });
 
-// --- Reusable UI Components (defined internally) ---
+// Reusable UI Components (defined internally)
 const Card = ({ children, className = '' }) => (
   <div className={`bg-white shadow-md rounded-lg p-6 ${className}`}>{children}</div>
 );
@@ -68,9 +67,8 @@ const CreateFeeStructureForm = () => {
   });
 
 
+  // this is component submit the final fees structure to Database. 
   const onSubmit = async (data) => {
-    // console.log("Submitting to API:", data);
-
     const response = await axiosClient.post('/fees/structure',data);
     alert("Fee Structure Created Successfully!");
     reset(); // Reset form after submission
@@ -98,19 +96,20 @@ const monthlyCollectionData = [
   { name: 'May', collected: 48000 }, { name: 'Jun', collected: 52000 },
 ];
 
-// --- Main Admin Dashboard Component ---
+// Main Admin Dashboard Component 
 const AdminFeesDashboard = () => {
 const [recentPayments,setRecentPayments] = useState([]);
 
-useEffect(() => {
 
+// this function fetches the latest fee submission details of students. 
+// which will display on admin UI and setRecentPayments.
+useEffect(() => {
   try 
   {
      const fetchPayments = async () => 
      {
        const response = await axiosClient.get('/fees/payments');
        setRecentPayments(response.data.data);
-       console.log("response: ",response);
      }
 
      fetchPayments();
@@ -140,6 +139,8 @@ useEffect(() => {
               <BarChart data={monthlyCollectionData}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis /><Tooltip /><Bar dataKey="collected" fill="#0284c7" /></BarChart>
             </ResponsiveContainer>
           </Card>
+
+          {/* this card displays recent fees submissions. */}
           <Card>
             <h2 className="text-xl font-semibold mb-4">Recent Payments</h2>
             <div className="overflow-x-auto">

@@ -21,7 +21,6 @@ const StatusBadge = ({ status }) => {
 
 
 const WardenGrievance = () => {
-  // State for view management ('list' or 'detail')
   const [view, setView] = useState('list');
   const [grievances, setGrievances] = useState([]);
   const [currentGrievance, setCurrentGrievance] = useState(null);
@@ -30,9 +29,9 @@ const WardenGrievance = () => {
   const [error, setError] = useState('');
   const [newComment, setNewComment] = useState('');
   
-console.log("current: ",currentGrievance);
-console.log("grievance: ",grievances);
-  // --- DATA FETCHING ---
+// console.log("current: ",currentGrievance);
+// console.log("grievance: ",grievances);
+  // DATA FETCHING
   const fetchAllGrievances = useCallback(async () => {
     try {
       setLoading(true);
@@ -49,7 +48,7 @@ console.log("grievance: ",grievances);
 
   const fetchGrievanceDetails = useCallback(async ({ _id }) => {
     try {
-      console.log("_id: ",_id);
+      // console.log("_id: ",_id);
         setLoading(true);
         const response = await axiosClient.get(`/grievance/details/${_id}`);
         setCurrentGrievance(response.data.data);
@@ -81,13 +80,14 @@ console.log("grievance: ",grievances);
   // const currentGrievance._id = ""
   // Handler for updating grievance status
   const handleUpdateStatus = async (status) => {
-    console.log("Hello0");
+    // console.log("Hello0");
     setActionLoading(true);
     try {
       const response = await axiosClient.put(`/grievance/${currentGrievance._id}/status`, { status });
       // Update the status in the local state to reflect the change immediately
-      console.log(response.data.data);
+      // console.log(response.data.data);
       setCurrentGrievance(response.data.data);
+      alert("Grievance status submitted successfully. Thank you for your action");
     } catch (err) {
       alert('Failed to update status.');
       console.error(err);
