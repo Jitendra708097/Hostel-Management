@@ -6,6 +6,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { DollarSign, Users, TrendingUp, AlertCircle, Database } from 'lucide-react';
 import axiosClient from '../../config/axiosClient';
 import AdminHeader from './AdminHeader';
+import FeeStructureList from './adminFeesStructureList';
 
 //  Zod Validation Schema 
 const feeStructureSchema = z.object({
@@ -169,6 +170,12 @@ useEffect(() => {
           </Card>
         </div>
       </div>
+
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <FeeStructureList />
+      </div>
+    </div>
       
     </div>
   );
