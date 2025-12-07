@@ -45,6 +45,60 @@ const deleteFeeStructure = async(req,res) => {
     }
 }
 
+// this is for updation of existing fee structures.
+const updateFeeStructure = async (req, res) => {
+    const { _id } = req.params;
+    
+    if (!_id) {
+        return res.status(400).json({ message: "ID is required for update." });
+    }
+    
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res.status(400).json({ message: "Please provide values to update." });
+    }
+    
+    try {
+        const updatedFeeStructure = await FeeStructure.findByIdAndUpdate(
+            _id,
+            req.body, // Directly pass the request body
+            {
+                new: true,  // it will returns updated data
+                runValidators: true  //Ensures updates validate against schema
+            }
+        );
+        
+        if (!updatedFeeStructure) {
+            return res.status(404).json({ message: "Fee structure not found." });
+        }
+        
+        res.status(200).json({ 
+            message: "Details updated successfully", 
+            data: updatedFeeStructure 
+        });
+        
+    } catch (error) {
+        console.error("Update error:", error);
+        
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ 
+                message: "Validation error", 
+                error: error.message 
+            });
+        }
+        
+        if (error.name === 'CastError') {
+            return res.status(400).json({ 
+                message: "Invalid ID format" 
+            });
+        }
+        
+        res.status(500).json({ 
+            message: "Server Error", 
+            error: error.message 
+        });
+    }
+};
+
 // Fetches a list of all available fee structures for the admin.
 const getAllFeeStructures = async (req, res) => {
     
@@ -198,4 +252,4 @@ const getStudentFeeDetails = async (req, res) => {
     }
 };
 
-module.exports = { createFeeStructure,deleteFeeStructure, getAllFeeStructures, getAllPayments, getStudentFeeDetails, createRazorpayOrder, verifyPayment, assignFeeToStudent }
+module.exports = { createFeeStructure,deleteFeeStructure,updateFeeStructure, getAllFeeStructures, getAllPayments, getStudentFeeDetails, createRazorpayOrder, verifyPayment, assignFeeToStudent }
