@@ -30,6 +30,21 @@ const createFeeStructure = async (req, res) => {
     }
 };
 
+// this component will delete existing fee structure from database.
+const deleteFeeStructure = async(req,res) => {
+    const _id = req.params;
+    if(!_id) {
+       return res.status(400).json({ message: "Fee Structure Id is required "});
+    }
+
+    try {
+        const feeStructure = await FeeStructure.findOneAndDelete(_id);
+        res.status(200).json({message: "This Fee Structure deleted Successfully from DB.", data:feeStructure});
+    } catch (err) {
+        res.status(500).json({ message: "server Error", error: err.message});
+    }
+}
+
 // Fetches a list of all available fee structures for the admin.
 const getAllFeeStructures = async (req, res) => {
     
@@ -183,4 +198,4 @@ const getStudentFeeDetails = async (req, res) => {
     }
 };
 
-module.exports = { createFeeStructure, getAllFeeStructures, getAllPayments, getStudentFeeDetails, createRazorpayOrder, verifyPayment, assignFeeToStudent }
+module.exports = { createFeeStructure,deleteFeeStructure, getAllFeeStructures, getAllPayments, getStudentFeeDetails, createRazorpayOrder, verifyPayment, assignFeeToStudent }
