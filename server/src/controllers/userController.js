@@ -346,4 +346,44 @@ const getAllStudents = async (req, res) => {
     }
 };
 
-module.exports = {register, getProfile, getAllUsers, deleteUserById, login, logout, updateDetails, forgotPassword, resetPassword, adminLogin, getAllStudents};
+const userPasswordChange = async (req,res) => {
+    const _id = req.params._id;
+    if(!_id)
+    {
+        res.status(400).json({ error: "User Id is required." });
+    }
+
+    const { newPassword, oldPassword } = req.body;
+    if(!newPassword)
+    {
+        res.status(400).json({ error: "Please Enter New Password." });
+    }
+
+    else if(!oldPassword)
+    {
+        res.status(400).json({ error: "Please Enter New Password." });
+    }
+
+    const user = await User.findById(_id);
+    const isPasswordValid = await bcrypt.compare( oldPassword, user.password);
+    if(!isPasswordValid)
+    {
+        return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    const hashCodeOfNewPassword = await bcrypt.hash(newPassword,10);
+    user.password = hashCodeOfNewPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password Changed Successfully."});
+}
+
+module.exports = {
+    register, 
+    getProfile,
+    getAllUsers, 
+    deleteUserById, 
+    login, 
+    logout, 
+    updateDetails, 
+    forgotPassword, resetPassword, adminLogin, getAllStudents, userPasswordChange};

@@ -1,7 +1,7 @@
 const express = require('express');
 const userRouter = express.Router();
 const userMiddleware = require('../middleware/userMiddleware');
-const { register, login, getAllUsers, getProfile, deleteUserById, logout, updateDetails, forgotPassword, resetPassword, adminLogin, getAllStudents } = require('../controllers/userController');
+const { register, login, userPasswordChange, getAllUsers, getProfile, deleteUserById, logout, updateDetails, forgotPassword, resetPassword, adminLogin, getAllStudents } = require('../controllers/userController');
 const upload = require('../middleware/uploadMiddleware');
 const adminMiddleware = require('../middleware/adminMiddleware');
 
@@ -12,6 +12,7 @@ userRouter.post('/register',upload.single('profilePhoto'), register); // done
 userRouter.post('/login', login); 
 userRouter.post('/logout',userMiddleware, logout); 
 userRouter.put('/update/:_id', userMiddleware, updateDetails);
+userRouter.put('/change-password/:_id',userMiddleware,userPasswordChange);
 userRouter.post('/forgot-password', forgotPassword); 
 userRouter.post('/reset-password/:token/:userId', resetPassword);
 userRouter.get('/check', userMiddleware, (req, res) => {
