@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import axiosClient from '../../config/axiosClient';
 import ProfilePhotoUploader from '../common/ProfilePhotoUploader';
 import { checkAuthStatus, logout } from '../../redux/authSlicer';
-import { motion } from 'framer-motion';
+import PasswordChangeForm from './changePassword';
 
 const ProfileView = () => {
   const dispatch = useDispatch();
@@ -47,6 +47,8 @@ const ProfileView = () => {
     fetchProfile();
   }, [isAuthenticated, user, navigate, reset]);
 
+  // this component calling the update api and finally updated user info 
+  // and also dispatching checkAuth for refreshing existing info about user.
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
@@ -91,7 +93,7 @@ const ProfileView = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Your Profile</h2>
             <div className="flex items-center gap-3">
-              <button onClick={handleLogout} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm hover:bg-red-700">Logout</button>
+              <button onClick={handleLogout} className="cursor-pointer px-4 py-2 rounded-lg bg-red-600 text-white text-sm hover:bg-red-700">Logout</button>
             </div>
           </div>
 
@@ -154,13 +156,15 @@ const ProfileView = () => {
                 </div>
               </div>
             </div>
-
+ 
             <div className="flex justify-end space-x-3">
-              <button type="button" onClick={() => navigate('/student/dashboard')} className="px-4 py-2 rounded-lg bg-gray-100">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="px-5 py-2 rounded-lg bg-blue-600 text-white">{isSubmitting ? 'Saving...' : 'Save Changes'}</button>
+              <button type="button" onClick={() => navigate('/student/dashboard')} className="cursor-pointer px-4 py-2 rounded-lg bg-gray-100">Cancel</button>
+              <button type="submit" disabled={isSubmitting} className="cursor-pointer px-5 py-2 rounded-lg bg-blue-600 text-white">{isSubmitting ? 'Saving...' : 'Save Changes'}</button>
             </div>
           </form>
         </div>
+        
+        <PasswordChangeForm />
       </div>
     </div>
   );
