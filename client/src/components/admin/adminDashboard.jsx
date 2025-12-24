@@ -3,7 +3,6 @@ import { motion, } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { features } from '../../utils/routes';
-import AdminHeader from './AdminHeader';
 import { useDispatch,} from 'react-redux';
 import { useNavigate } from 'react-router';
 import { LogOut } from 'lucide-react';
@@ -61,7 +60,6 @@ const AdminDashboard = () => {
             {/* Main Content */}
             <main className="pt-44 pb-16">
                 <div className="container mx-auto px-6">
-                    {/* <AdminHeader title="Managing Dashboard" subtitle="Overview & quick actions" /> */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {features.map((feature, index) => (
                         <Link to={feature.path} key={index} >

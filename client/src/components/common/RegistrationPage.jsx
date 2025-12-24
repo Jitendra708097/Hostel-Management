@@ -242,7 +242,7 @@ const RegistrationPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white flex items-center justify-between rounded-t-xl">
+        <div className="bg-linear-to-r from-indigo-600 to-purple-600 p-6 text-white flex items-center justify-between rounded-t-xl">
           <div className="flex items-center space-x-4">
             <div className="w-14 h-14 rounded-full flex items-center justify-center bg-white/20">
               <Home className="h-8 w-8 text-white" />
@@ -643,7 +643,7 @@ const RegistrationPage = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex items-center justify-center min-w-[180px] px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-md hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center min-w-[180px] px-6 py-2.5 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-md hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {submitting ? (
                     <>

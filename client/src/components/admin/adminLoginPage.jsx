@@ -19,17 +19,8 @@ const AdminLoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticate, loading, error } = useSelector(state => state.auth);
-  // console.log("Error: ",error?.error);  this line for debugging 
-  // Using a more modern and high-quality image placeholder
-  // const hostelImageUrl = "https://images.unsplash.com/photo-1579761922659-dc7a0665f979?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-
+  
   const { register, handleSubmit, formState: { errors }, } = useForm({ resolver: zodResolver(loginSchema) });
-
-  // useEffect(() => {
-  //   if (isAuthenticate) {
-  //     navigate('/'); // Corrected navigation
-  //   }
-  // }, [isAuthenticate, navigate]);
 
   const onSubmit = async (data) => {
     dispatch(adminLoginUser(data));

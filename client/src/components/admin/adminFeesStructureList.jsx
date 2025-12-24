@@ -16,11 +16,8 @@ const FeeStructureList = () => {
     try {
       setLoading(true);
       const response = await axiosClient.get('/fees/structures');
-      console.log("Res: ",response);
       if (response.statusText != 'OK') throw new Error('Failed to fetch');
-      console.log("Res0: ",response.data.data);
       setFeeStructures(response.data.data);
-      console.log("Hii")
     } catch (err) {
         // console.log("error")
       setError(err.message);
@@ -31,7 +28,6 @@ const FeeStructureList = () => {
 
   const handleDelete = async (id) => {
     try {
-        console.log("delete")
       const response = await axiosClient.delete(`/fees/structure/${id}/delete`);
 
       if (response.statusText != 'OK') throw new Error('Delete failed');
@@ -49,7 +45,6 @@ const FeeStructureList = () => {
 
   const handleUpdate = async (id, updatedData) => {
     try {
-        console.log("update")
       const response = await axiosClient.put(`/fees/${id}/update`,updatedData);
       if (response.statusText != 'OK') throw new Error('Update failed');
       // Update in state

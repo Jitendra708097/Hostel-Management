@@ -103,6 +103,7 @@ const AttendanceDashboard = () => {
 
         {isLoading && <p className="text-center mt-8">Loading students...</p>}
 
+        {/* Attendence clicking card where admin will click card and it will selected. */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
           {students.map(student => (
             <div key={student._id} onClick={() => handleTogglePresent(student._id)} className={`p-3 rounded-lg text-center cursor-pointer border-2 transition-all duration-200 ${presentStudentIds.has(student._id) ? 'bg-green-100 border-green-500 shadow-md scale-105' : 'bg-white border-gray-200 hover:shadow-lg'}`}>

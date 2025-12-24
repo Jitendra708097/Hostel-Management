@@ -29,8 +29,6 @@ const WardenGrievance = () => {
   const [error, setError] = useState('');
   const [newComment, setNewComment] = useState('');
   
-// console.log("current: ",currentGrievance);
-// console.log("grievance: ",grievances);
   // DATA FETCHING
   const fetchAllGrievances = useCallback(async () => {
     try {
@@ -48,7 +46,6 @@ const WardenGrievance = () => {
 
   const fetchGrievanceDetails = useCallback(async ({ _id }) => {
     try {
-      // console.log("_id: ",_id);
         setLoading(true);
         const response = await axiosClient.get(`/grievance/details/${_id}`);
         setCurrentGrievance(response.data.data);
@@ -77,15 +74,11 @@ const WardenGrievance = () => {
     setView('list');
   };
   
-  // const currentGrievance._id = ""
   // Handler for updating grievance status
   const handleUpdateStatus = async (status) => {
-    // console.log("Hello0");
     setActionLoading(true);
     try {
       const response = await axiosClient.put(`/grievance/${currentGrievance._id}/status`, { status });
-      // Update the status in the local state to reflect the change immediately
-      // console.log(response.data.data);
       setCurrentGrievance(response.data.data);
       alert("Grievance status submitted successfully. Thank you for your action");
     } catch (err) {

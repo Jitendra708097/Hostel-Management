@@ -65,6 +65,8 @@ const UpdateMenu = () => {
 	return (
 		<div className="bg-slate-50 min-h-screen p-4 sm:p-8">
 			<div className="max-w-3xl mx-auto space-y-6">
+
+				{/* updates the existing menu.  */}
 				<form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow admin-card space-y-4">
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
 						<div>
@@ -93,6 +95,7 @@ const UpdateMenu = () => {
 					</div>
 				</form>
 
+                {/* this part is displaying existing of selected day. */}
 				<div className="bg-white p-6 rounded-lg shadow admin-card">
 					<h3 className="text-lg font-semibold mb-3">Current Menu for {day}</h3>
 					{menuForDay ? (

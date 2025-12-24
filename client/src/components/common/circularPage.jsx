@@ -59,8 +59,6 @@ const CircularsPage = ({ isAdmin }) => {
             setLoading(true);
             // Ensure this endpoint matches your backend route
             const response = await axiosClient.get('/circular/');
-            console.log("circulars: ",response);
-            console.log("Response: ",response.data); 
             setCirculars(response.data || []);
             setError('');
 
@@ -93,8 +91,6 @@ const CircularsPage = ({ isAdmin }) => {
     
     // Form submission handler
     const onSubmit = async (data) => {
-        // console.log("Data: ",data);
-
          const formData = new FormData();
 
         // Append text fields
@@ -110,15 +106,12 @@ const CircularsPage = ({ isAdmin }) => {
         setUploadError('');
         setUploadSuccess('');
 
-        // console.log("fromdata: ",formData);
-
         try {
             const response = await axiosClient.post('/circular/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log("response: ",response);
             setUploadSuccess('Circular uploaded successfully!');
             reset(); // Reset react-hook-form
             setPreview(null); // Clear the preview

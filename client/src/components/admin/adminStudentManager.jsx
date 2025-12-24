@@ -32,14 +32,9 @@ const StudentManager = () => {
             // Assume you have an endpoint to get all students
             // This is a necessary addition to your backend for this feature to work
             const studentsResponse = await axiosClient.get(`/user/getAllStudents`); // ASSUMED ENDPOINT
-            console.log("StudentsList: ",studentsResponse.data);
 
             // <<< API CALL 1: Get All Fee Structures >>>
             const structuresResponse = await axiosClient.get(`/fees/structures`);
-             console.log("Stuctures: ",structuresResponse.data);
-            // console.log((await structuresResponse).data)
-
-            // const [studentsResponse, structuresResponse] = await Promise.all([studentsPromise, structuresPromise]);
             
             setStudents(studentsResponse.data.data); // Adjust based on your actual student API response
             setStructures(structuresResponse.data.data);

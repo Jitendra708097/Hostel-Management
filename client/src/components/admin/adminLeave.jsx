@@ -66,20 +66,15 @@ const WardenLeaveDashboard = () => {
     }, []);
 
     const handleAction = (action, application) => setModalInfo({ action, details: application });
-    console.log(" modal ", modalInfo);
 
     const handleConfirmAction = async (action, comment) => {
         const applicationId = modalInfo.details._id;
-        console.log("action: ",action,wardenComment);
         const response = await axiosClient.put(`/leave/updateStatus/${applicationId}`, { status: action, wardenComment: comment });
-        console.log(`Action: ${action}, Comment: ${comment}`);
-        console.log("response: ",response.data.data);
         setModalInfo(null);
         // Here you would refetch data
     };
     
     const filteredApplications = applications.filter(app => filter === 'All' || app.status === filter);
-    console.log("fieltered :"+filteredApplications);
 
     return (
         <div className="bg-gray-100 text-white min-h-screen p-4 sm:p-8 font-sans">

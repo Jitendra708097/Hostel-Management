@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import axiosClient from '../../config/axiosClient';
 import { LogIn, UserPlus, Utensils, MapPin, Star, Wifi, Shield, Dumbbell, Users } from 'lucide-react';
 import {  MESS_TIMINGS, LEADERCARD_DATA } from '../../../constants';
-import Contact from '../../utils/contactForm';
+import Contact from '../homePage/contactForm';
 import Facilities from './facilities';
 import FEES from './feesFacility';
 import GallerySection from './gallery';
@@ -152,7 +152,7 @@ const HomePage = () => {
 
       {/* Mobile Navigation */}
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
+        <div className="md:hidden bg-red-600 overflow-x-hidden border-t border-gray-100 shadow-lg">
           <div className="px-4 py-3 space-y-1">
             {['Leadership', 'Facilities', 'Fees', 'Mess', 'Gallery', 'Contact'].map((item) => (
               <button
