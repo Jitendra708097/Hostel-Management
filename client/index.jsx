@@ -6,6 +6,7 @@ import './src/style/index.css';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router';
 import { store } from './src/redux/store';
+import ErrorBoundary from './src/utils/ErrorBoundary';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -14,6 +15,7 @@ if (!rootElement) {
 
 const root = ReactDOM.createRoot(rootElement);
 root.render(
+  <ErrorBoundary>
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
@@ -21,4 +23,5 @@ root.render(
       </BrowserRouter>
     </Provider>
   </StrictMode>
+  </ErrorBoundary>
 );

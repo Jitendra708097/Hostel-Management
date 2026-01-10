@@ -9,6 +9,7 @@ import Facilities from './facilities';
 import FEES from './feesFacility';
 import GallerySection from './gallery';
 import Footer from './footer';
+import logger from '../../utils/logger';
 
 
 const HomePage = () => {
@@ -27,6 +28,7 @@ const HomePage = () => {
       try {
         const response = await axiosClient.get('/menu/show');
         setMenuData(response.data || []);
+        logger.success('Fetched menu data', response.data);
       } catch (e) {
         setMenuData([]);
       }
