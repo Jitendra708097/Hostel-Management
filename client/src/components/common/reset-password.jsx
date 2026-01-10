@@ -28,32 +28,13 @@ const ResetPasswordPage = () => {
   const [tokenValid, setTokenValid] = useState(true);
 
   const navigate = useNavigate();
-//   const [searchParams] = useSearchParams();
-//   const token = searchParams.get('token');
-//   console.log("Reset token from URL:", token);
 
-//   const userId = searchParams.get('userId');
-//   console.log("User ID from URL:", userId);
 const { token, userId } = useParams();
-console.log("Reset token from URL:", token);
-console.log("User ID from URL:", userId);
+
 
   const resetPasswordForm = useForm({
     resolver: zodResolver(resetPasswordSchema)
   });
-
-//   // Verify token on component mount
-//   useEffect(() => {
-//     if (!token) {
-//       setTokenValid(false);
-//       setMessage({
-//         type: 'error',
-//         text: 'Invalid or missing reset token. Please request a new password reset link.'
-//       });
-//     }
-//     // You can add an API call here to verify token validity with backend
-//     // verifyToken();
-//   }, [token]);
 
   const onResetPasswordSubmit = async (data) => {
     if (!token) {
@@ -81,7 +62,6 @@ console.log("User ID from URL:", userId);
         newPassword: data.newPassword
       });
 
-      console.log("Password reset response:", response.data);
       
       setMessage({
         type: 'success',

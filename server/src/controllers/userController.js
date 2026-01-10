@@ -78,7 +78,6 @@ const getProfile = async (req, res) => {
     if (!_id) {
         return res.status(400).json({ error: 'User ID is required' });
     }
-    // console.log("Fetching profile for user ID:", _id); // Debugging line
 
     const user = await User.findById(_id).select('-password');
     res.status(200).json({ message: 'User profile retrieved successfully!', user });
@@ -128,7 +127,6 @@ const login = async (req, res) => {
         return res.status(400).json({ error: 'Invalid email or password' });
     }
     // Successful login
-    console.log("User logged in:", user);
     const reply = {
         emailId: user.emailId,
         userName: user.userName,
@@ -142,11 +140,9 @@ const login = async (req, res) => {
         process.env.JWT_SECRET_KEY,
         { expiresIn: 60*60 }
     );
-    // console.log("Generated JWT Token:", token); // Debugging line
+
     const token123 = res.cookie('token', token, { maxAge: 60*60*1000}); // 1 hour    
-    // console.log('token123',token123);
     res.status(200).json({ message: 'User logged in successfully!', user: reply });
-    // console.log("relpy",reply);
 }
 
 // user can logout from this platform via this route
@@ -193,19 +189,15 @@ const forgotPassword = async (req, res) => {
             // To prevent email enumeration, send a generic success message
             return res.status(200).send("If a user with that email exists, a password reset link has been sent.");
         }
-        console.log("user: debugging ",user);
 
         // 2. Find and delete any existing token for this user
         let token = await Token.findOne({ userId: user._id });
-        console.log("token: debugging ",token);
         if (token) {
             await Token.findOneAndDelete({ _id: token._id });
         }
 
-        console.log("user: ",user);
         // 3. Generate a new secure random token
         const resetToken = crypto.randomBytes(32).toString('hex');
-        console.log("resettoken: ",resetToken);
         // 4. Create and save the new token in the database
         await new Token({
             userId: user._id,
@@ -233,8 +225,6 @@ const forgotPassword = async (req, res) => {
 // Reset Password function 
 const resetPassword = async (req, res) => {
     try {
-        console.log("Reset Password invoked with params:", req.params);
-        console.log("Request body:", req.body);
         const { newPassword } = req.body;
         
         // 1. Find the user and the token
@@ -243,7 +233,6 @@ const resetPassword = async (req, res) => {
             return res.status(400).send("Invalid link or user does not exist.");
         }
 
-        console.log("Found user:", user);
         const token = await Token.findOne({
             userId: user._id,
             token: req.params.token,
@@ -253,7 +242,6 @@ const resetPassword = async (req, res) => {
             return res.status(400).send("Invalid link or token has expired.");
         }
 
-        console.log("Found valid token:", token);
         // 2. Hash the new password
         const password = newPassword;
         const salt = await bcrypt.genSalt(10);
@@ -267,7 +255,6 @@ const resetPassword = async (req, res) => {
         await token.deleteOne();
 
         res.status(200).send("Password has been reset successfully.");
-        console.log("Password reset successful for user:", user.emailId);
 
     } catch (error) {
         console.error(error);
@@ -278,8 +265,6 @@ const resetPassword = async (req, res) => {
 // admin login on this platform 
 const adminLogin = async (req, res) => {
 
-    console.log("Admin Login page invoked.");
-    console.log(req.body);
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });

@@ -12,6 +12,7 @@ const FeeStructureList = () => {
     fetchFeeStructures();
   }, []);
 
+  // Fetch all fee structures from Database. 
   const fetchFeeStructures = async () => {
     try {
       setLoading(true);
@@ -19,13 +20,13 @@ const FeeStructureList = () => {
       if (response.statusText != 'OK') throw new Error('Failed to fetch');
       setFeeStructures(response.data.data);
     } catch (err) {
-        // console.log("error")
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  // delete existing fee structure from database. 
   const handleDelete = async (id) => {
     try {
       const response = await axiosClient.delete(`/fees/structure/${id}/delete`);
@@ -43,6 +44,7 @@ const FeeStructureList = () => {
     }
   };
 
+  // update existing fee structure. 
   const handleUpdate = async (id, updatedData) => {
     try {
       const response = await axiosClient.put(`/fees/${id}/update`,updatedData);
@@ -70,7 +72,7 @@ const FeeStructureList = () => {
       </div>
     );
   }
-// console.log("error: ",error);
+
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-6">

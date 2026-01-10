@@ -101,7 +101,6 @@ const StudentGrievance = () => {
       const response = await axiosClient.post(`/grievance/submit/${user?._id}`, submissionData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      console.log("resonse: ",response.data);
       alert('Grievance submitted successfully!');
       setView('list'); // Go back to the list view after submission
     } catch (err) {

@@ -57,7 +57,6 @@ const AdminLoginPage = () => {
     
     try {
       const response = await axiosClient.post('/user/forgot-password', data);
-      console.log("Response: ", response.data);
       setViewState('linkSent');
       forgotPasswordForm.reset();
       setApiMessage({ 

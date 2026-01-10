@@ -55,7 +55,6 @@ const WardenLeaveDashboard = () => {
             try {
                 const response = await axiosClient.get('/leave/viewStatus');
                 setApplications(response.data.data);
-                console.log("response: ",response.data.data);
             } catch (err) {
                 setError('Failed to fetch applications.');
             } finally {

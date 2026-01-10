@@ -26,7 +26,6 @@ const PasswordChangeForm = () => {
   const [isChanging, setIsChanging] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
-  console.log("user: ",user);
 
   const {
     register,
@@ -49,8 +48,6 @@ const PasswordChangeForm = () => {
   const onSubmit = async (data) => {
     setIsChanging(true);
     try {
-      // Your password change API call here
-      console.log('Password change data:', data);
       
       // Simulate API call
       const response = await axiosClient.put(`/user/change-password/${user._id}`,data);

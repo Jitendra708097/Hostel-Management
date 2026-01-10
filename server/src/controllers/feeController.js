@@ -7,7 +7,6 @@ const razorpay = require('../config/razorpay');
 // This function allows an admin to define a new fee structure.
 // It takes details like structureName and fee components from the request body.
 const createFeeStructure = async (req, res) => {
-    console.log("req.body: ",req.body);
     try {
         const { structureName, description, components } = req.body;
 
@@ -22,7 +21,6 @@ const createFeeStructure = async (req, res) => {
             components,
         });
         
-        console.log("new: ",newStructure);
         await newStructure.save();
         res.status(201).json({ message: 'Fee structure created successfully', data: newStructure });
     } catch (error) {

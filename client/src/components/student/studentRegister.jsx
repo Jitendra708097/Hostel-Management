@@ -55,10 +55,7 @@ const RegisterForm = () => {
 
   // check user authentication status and redirect to student dashboard if already logged in
   useEffect(() => {
-    // console.log("Hii");
-    // console.log("isAuthenticate: ",isAuthenticate,user);
     if (isAuthenticate && user?.role === 'student') {
-      // console.log("Hello");
       navigate("/student/dashboard");
     }
   }, [isAuthenticate]);
@@ -67,7 +64,6 @@ const RegisterForm = () => {
   // this is handling api calling and after successful registration re-directed to the student dashboard 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    console.log("Data: ",data);
     const formData = new FormData();
     Object.keys(data).forEach(key => {
         if (data[key]) { // Append only if value is not null/undefined

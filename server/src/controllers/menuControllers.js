@@ -9,7 +9,6 @@ const getMenu = async(req,res) => {
             return res.status(404).json({message: 'No menu items found'});
         }
         res.status(200).json(menu);
-        // console.log(menu);
     }
     catch(error){
         res.status(500).json({message: 'Server error', error: error.message});
@@ -21,14 +20,11 @@ const fetchMenuOfSelectedDay = async (req,res) => {
     try{
 
         const days = req.params.day;
-        // console.log("Days: ",days);
         const menu = await Menu.find({days});
-        // console.log("Backend Menu: ",menu);
         if(menu.length === 0){
             return res.status(404).json({message: 'No menu items found'});
         }
         res.status(200).json(menu);
-        // console.log(menu);
     }
     catch(error){
         res.status(500).json({message: 'Server error', error: error.message});

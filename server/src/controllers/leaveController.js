@@ -16,6 +16,7 @@ const leaveRequestByStudent =async (req, res) => {
     }
 };
 
+// Check leave Status by student that approved or not. 
 const viewLeaveStatus = async (req, res) => {
     try {
         const leaveApplications = await LeaveApplication.find({ student: req.params._id }).sort({ createdAt: -1 });
@@ -25,6 +26,7 @@ const viewLeaveStatus = async (req, res) => {
     }
 };
 
+// View All leave application request by students. 
 const viewAllLeaveApplicationsByWarden = async (req, res) => {
     try {
         const leaveApplications = await LeaveApplication.find().populate('student', 'userName profileURL course year').sort({ createdAt: -1 });
@@ -34,6 +36,7 @@ const viewAllLeaveApplicationsByWarden = async (req, res) => {
     }
 }
 
+// Approved or reject leave status if approved then gatePass will issue to the student.
 const updateLeaveStatusByWarden = async (req, res) => {
     const { status, wardenComment } = req.body;
     try {

@@ -4,10 +4,8 @@ const redisClient = require('../config/redis');
 
 const userMiddleware = async (req, res, next) => {
 
-    console.log('User middleware invoked');
     try {
         const { token } = req.cookies;
-        console.log('Token from cookies:', req.cookies);
         if (!token) {
             throw new Error('Authentication token is missing');
         }
@@ -16,7 +14,6 @@ const userMiddleware = async (req, res, next) => {
         if (!payload) {
             throw new Error('Invalid authentication token');
         }
-        console.log(payload);
 
         const { _id } = payload;
         if (!_id) {
@@ -34,7 +31,6 @@ const userMiddleware = async (req, res, next) => {
         }
 
         req.user = user;
-        console.log('req.user', req.user);
         next();
     } catch (error) {
         res.status(401).json({ message: error.message });

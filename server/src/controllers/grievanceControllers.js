@@ -16,9 +16,8 @@ const grievanceSubmitted = async (req, res) => {
         // Upload to Cloudinary
         if(req.file) {
             const fileBuffer = req.file.buffer;
-            // console.log("fileBuffer: ",fileBuffer);
             const fileStream = bufferToStream(fileBuffer);
-            // console.log("file: ",fileStream);
+
             const uploadOptions = {
             folder: 'Hostel_Management/grievance', // Optional: Folder in Cloudinary
             resource_type: req.file.mimetype.startsWith('video/') ? 'video' : 'auto', // Auto-detect or specify
@@ -61,11 +60,9 @@ const grievanceSubmitted = async (req, res) => {
 // In this component student can see thier all 
 // grievance which they have submitted in past i.e. grievance history 
 const getMyGrievances = async (req, res) => {
-    console.log("getMyGrievance0: ",req.params._id);
     try {
         const grievances = await Grievance.find({ studentId: req.params._id }).sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: grievances });
-        console.log("grievance: ",grievances);
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server Error', error: error.message });
     }
@@ -99,7 +96,6 @@ const getAllGrievances = async (req, res) => {
     try {
         // Populating studentId to get student details, but excluding sensitive info if needed
         const grievances = await Grievance.find().populate('studentId', 'userName year course').sort({ createdAt: -1 });
-        console.log("Hii: ",grievances);
         res.status(200).json({ success: true, data: grievances });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server Error', error: error.message });
@@ -111,7 +107,6 @@ const getAllGrievances = async (req, res) => {
 // grievance for information about grievance i.e. grievanceDetails
 const getGrievanceDetails = async (req, res) => {
     try {
-        console.log("Hello 1")
         const grievance = await Grievance.findById({ _id:req.params._id }).populate('studentId', 'userName emailId year');
         if (!grievance) {
             return res.status(404).json({ success: false, message: 'Grievance not found.' });
@@ -159,8 +154,6 @@ const addComment = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Grievance not found.' });
         }
 
-        console.log("Hello ji");
-        console.log("user: ",req.user);
         const newComment = {
             author: req.params._id,  //req.user._id,
             authorName: "Jitendra Surendra",  // req.user.userName,
@@ -168,11 +161,9 @@ const addComment = async (req, res) => {
             text: text,
         };
 
-        console.log("Hello ji1");
         grievance.comments.push(newComment);
         await grievance.save();
         
-        console.log("Hello ji2");
 
         res.status(201).json({ success: true, message: 'Comment added.', data: grievance });
     } catch (error) {

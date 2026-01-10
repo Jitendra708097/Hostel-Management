@@ -69,7 +69,6 @@ const StudentLeaveDashboard = () => {
             try {
                 const response = await axiosClient.get(`/leave/check/${user?._id}`);
                 setApplications(response.data.data);
-                console.log("Data: ",response.data.data);
             } catch (err) {
                 setError('Failed to fetch leave applications.');
             } finally {
@@ -84,7 +83,6 @@ const StudentLeaveDashboard = () => {
         try {
             const response = await axiosClient.post(`/leave/request/${user?._id}`,data);
             alert('Leave application submitted successfully!');
-            console.log("response: ",response.data);
             reset();
             setIsFormVisible(false);
             // Here you would refetch the applications

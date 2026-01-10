@@ -4,13 +4,7 @@ const User = require('../models/UserSchema');
 // Function to validate email
 
 const validatorFunction = async (data) => {
-
-    // const mandatoryFields = ['emailId', 'password', 'userName', 'year', 'course', 'institution'];
-    // for (const field of mandatoryFields) {
-    //     if (!data[field]) {
-    //         return { valid: false, message: `${field} is required.` };
-    //     }
-    // }
+    
     const mandatoryFields = ['emailId', 'password', 'userName', 'year', 'course', 'institution'];
     Object.keys(data).forEach(key => {
         if (mandatoryFields.includes(key) && !data[key]) {
