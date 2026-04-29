@@ -65,50 +65,51 @@ const UpdateMenu = () => {
 	return (
 		<div className="bg-slate-50 min-h-screen p-4 sm:p-8">
 			<div className="max-w-3xl mx-auto space-y-6">
+				<AdminHeader title="Mess Menu" subtitle="Update daily meal items for students" />
 
 				{/* updates the existing menu.  */}
-				<form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow admin-card space-y-4">
+				<form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 space-y-4">
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
 						<div>
-							<label className="block text-sm font-medium text-gray-700">Day</label>
-							<select value={day} onChange={(e) => setDay(e.target.value)} className="cursor-pointer mt-1 block w-full rounded-md border-gray-500 p-2">
+							<label className="block text-sm font-medium text-slate-700">Day</label>
+							<select value={day} onChange={(e) => setDay(e.target.value)} className="cursor-pointer mt-1 block w-full rounded-md border border-slate-300 p-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30 outline-none">
 								{WEEKDAYS.map(d => <option key={d} value={d}>{d}</option>)}
 							</select>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-gray-700">Meal</label>
-							<select value={meal} onChange={(e) => setMeal(e.target.value)} className="cursor-pointer mt-1 block w-full rounded-md border-gray-300 p-2">
+							<label className="block text-sm font-medium text-slate-700">Meal</label>
+							<select value={meal} onChange={(e) => setMeal(e.target.value)} className="cursor-pointer mt-1 block w-full rounded-md border border-slate-300 p-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30 outline-none">
 								{MEALS.map(m => <option key={m} value={m}>{m}</option>)}
 							</select>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-gray-700">Item Name</label>
-							<input value={itemName} onChange={(e) => setItemName(e.target.value)} placeholder="e.g., Masala Dosa" className="mt-1 block w-full rounded-md border-gray-300 p-2" required />
+							<label className="block text-sm font-medium text-slate-700">Item Name</label>
+							<input value={itemName} onChange={(e) => setItemName(e.target.value)} placeholder="e.g., Masala Dosa" className="mt-1 block w-full rounded-md border border-slate-300 p-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30 outline-none" required />
 						</div>
 					</div>
 
-					<div className="flex items-center gap-3">
-						<button type="button" onClick={handleFetchClick} className="cursor-pointer px-4 py-2 rounded bg-white border text-gray-700 hover:bg-gray-50 clickable">Fetch Day Menu</button>
-						<button type="submit" disabled={loading} className="cursor-pointer px-4 py-2 rounded bg-sky-600 text-white hover:bg-sky-700 clickable">{loading ? 'Updating...' : 'Add / Update'}</button>
-						{success && <p className="text-sm text-green-600">{success}</p>}
-						{error && <p className="text-sm text-red-600">{error}</p>}
+					<div className="flex flex-col sm:flex-row sm:items-center gap-3">
+						<button type="button" onClick={handleFetchClick} className="cursor-pointer px-4 py-2 rounded-md bg-white border border-slate-300 text-slate-700 hover:bg-slate-50">Fetch Day Menu</button>
+						<button type="submit" disabled={loading} className="cursor-pointer px-4 py-2 rounded-md bg-cyan-700 text-white hover:bg-cyan-800 disabled:bg-cyan-300">{loading ? 'Updating...' : 'Add / Update'}</button>
+						{success && <p className="text-sm text-emerald-700 rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2">{success}</p>}
+						{error && <p className="text-sm text-red-700 rounded-md bg-red-50 border border-red-200 px-3 py-2">{error}</p>}
 					</div>
 				</form>
 
                 {/* this part is displaying existing of selected day. */}
-				<div className="bg-white p-6 rounded-lg shadow admin-card">
-					<h3 className="text-lg font-semibold mb-3">Current Menu for {day}</h3>
+				<div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+					<h3 className="text-lg font-semibold mb-3 text-slate-900">Current Menu for {day}</h3>
 					{menuForDay ? (
 						<div className="space-y-3">
 							{Array.isArray(menuForDay.mealAndItem) && menuForDay.mealAndItem.length > 0 ? (
 								menuForDay.mealAndItem.map(mi => (
-									<div key={mi.meal} className="flex items-center justify-between p-3 border rounded">
+									<div key={mi.meal} className="flex items-center justify-between p-3 border border-slate-200 rounded-md hover:bg-cyan-50 transition-colors">
 										<div>
-											<p className="font-medium">{mi.meal}</p>
-											<p className="text-sm text-gray-600">{mi.itemName}</p>
+											<p className="font-medium text-slate-900">{mi.meal}</p>
+											<p className="text-sm text-slate-600">{mi.itemName}</p>
 										</div>
 										<div className="flex gap-2">
-											<button onClick={() => { setMeal(mi.meal); setItemName(mi.itemName); }} className="cursor-pointer px-3 py-1 bg-amber-100 text-amber-700 rounded clickable">Edit</button>
+											<button onClick={() => { setMeal(mi.meal); setItemName(mi.itemName); }} className="cursor-pointer px-3 py-1 bg-cyan-50 text-cyan-700 rounded-md hover:bg-cyan-100">Edit</button>
 										</div>
 									</div>
 								))

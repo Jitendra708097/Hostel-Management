@@ -6,7 +6,7 @@ const isLocalhost = window.location.hostname === 'localhost' || window.location.
 // instance with predefined configuration settings
 //  such as base URL and headers.
 const axiosClient = axios.create({
-  baseURL: isLocalhost ? 'http://localhost:3000' : "http://13.233.230.164:3000",
+  baseURL: isLocalhost ? 'http://localhost:3000' : "http://13.127.163.95:3000",
   withCredentials:true,
   headers: {
     'Content-Type': 'application/json',

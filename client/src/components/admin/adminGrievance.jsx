@@ -3,17 +3,18 @@ import axiosClient from '../../config/axiosClient';
 import { format } from 'date-fns';
 import FullPageRefreshButton from '../../utils/refreshButton';
 import AdminHeader from './AdminHeader';
+import { ArrowLeft, ChevronRight, MessageSquare, Send } from 'lucide-react';
 
 // Reusable StatusBadge component (same as student's)
 const StatusBadge = ({ status }) => {
   const statusStyles = {
-    Pending: 'bg-yellow-100 text-yellow-800',
-    Approved: 'bg-blue-100 text-blue-800',
-    Rejected: 'bg-red-100 text-red-800',
-    Resolved: 'bg-green-100 text-green-800',
+    Pending: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
+    Approved: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
+    Rejected: 'bg-red-50 text-red-700 ring-1 ring-red-200',
+    Resolved: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
   };
   return (
-    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusStyles[status]}`}>
+    <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusStyles[status] || statusStyles.Pending}`}>
       {status}
     </span>
   );
@@ -28,6 +29,7 @@ const WardenGrievance = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState('');
   const [newComment, setNewComment] = useState('');
+  const [notice, setNotice] = useState(null);
   
   // DATA FETCHING
   const fetchAllGrievances = useCallback(async () => {
@@ -49,7 +51,7 @@ const WardenGrievance = () => {
         setLoading(true);
         const response = await axiosClient.get(`/grievance/details/${_id}`);
         setCurrentGrievance(response.data.data);
-    } catch (err) {
+    } catch {
         setError('Failed to fetch grievance details.');
     } finally {
         setLoading(false);
@@ -80,9 +82,9 @@ const WardenGrievance = () => {
     try {
       const response = await axiosClient.put(`/grievance/${currentGrievance._id}/status`, { status });
       setCurrentGrievance(response.data.data);
-      alert("Grievance status submitted successfully. Thank you for your action");
+      setNotice({ type: 'success', message: `Grievance marked as ${status}.` });
     } catch (err) {
-      alert('Failed to update status.');
+      setNotice({ type: 'error', message: 'Failed to update status.' });
       console.error(err);
     } finally {
       setActionLoading(false);
@@ -99,8 +101,9 @@ const WardenGrievance = () => {
       const response = await axiosClient.post(`/grievance/${currentGrievance._id}/comment`, { text: newComment });
       setCurrentGrievance(response.data.data); // Update the whole grievance object with the new comment
       setNewComment(''); // Clear the input field
+      setNotice({ type: 'success', message: 'Comment posted.' });
     } catch (err) {
-      alert('Failed to add comment.');
+      setNotice({ type: 'error', message: 'Failed to add comment.' });
       console.error(err);
     } finally {
       setActionLoading(false);
@@ -110,19 +113,19 @@ const WardenGrievance = () => {
   // --- RENDER LOGIC ---
   const renderContent = () => {
     if (loading && !currentGrievance) {
-      return <div className="text-center p-8">Loading dashboard...</div>;
+      return <div className="rounded-lg border border-slate-200 bg-white p-8 text-center text-slate-600 shadow-sm">Loading dashboard...</div>;
     }
 
     if (error) {
-        return <div className="text-center p-8 text-red-500">{error}</div>;
+        return <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center text-red-700">{error}</div>;
     }
     
     // DETAIL VIEW
     if (view === 'detail' && currentGrievance) {
       return (
-        <div className="bg-white p-6 md:p-8 rounded-lg shadow-md">
-          <button onClick={handleBackToList} className="cursor-pointer mb-6 text-indigo-600 hover:text-indigo-800 font-medium">
-            &larr; Back to Dashboard
+        <div className="bg-white p-6 md:p-8 rounded-lg border border-slate-200 shadow-sm">
+          <button onClick={handleBackToList} className="cursor-pointer mb-6 inline-flex items-center gap-2 text-cyan-700 hover:text-cyan-900 font-medium">
+            <ArrowLeft className="h-4 w-4" /> Back to Dashboard
           </button>
           
           {/* Grievance Info */}
@@ -141,12 +144,12 @@ const WardenGrievance = () => {
           <hr className="my-6" />
 
           {/* Warden Actions */}
-          <div className="p-4 bg-gray-50 rounded-lg mb-6">
-            <h3 className="font-semibold text-gray-700 mb-3">Actions</h3>
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 mb-6">
+            <h3 className="font-semibold text-slate-800 mb-3">Actions</h3>
             <div className="flex flex-wrap gap-2">
                 <button onClick={() => handleUpdateStatus('Approved')} disabled={actionLoading} className="cursor-pointer px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-blue-300">Approve</button>
                 <button onClick={() => handleUpdateStatus('Rejected')} disabled={actionLoading} className="cursor-pointer px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:bg-red-300">Reject</button>
-                <button onClick={() => handleUpdateStatus('Resolved')} disabled={actionLoading} className="cursor-pointer px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:bg-green-300">Mark as Resolved</button>
+                <button onClick={() => handleUpdateStatus('Resolved')} disabled={actionLoading} className="cursor-pointer px-3 py-1 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 disabled:bg-emerald-300">Mark as Resolved</button>
             </div>
           </div>
           
@@ -160,7 +163,7 @@ const WardenGrievance = () => {
             <div className="space-y-4 mb-6">
                 {currentGrievance.comments && currentGrievance.comments.length > 0 ? (
                     currentGrievance.comments.map(comment => (
-                        <div key={comment._id} className={`p-4 rounded-lg ${comment.role === 'warden' ? 'bg-indigo-50' : 'bg-gray-50'}`}>
+                        <div key={comment._id} className={`p-4 rounded-lg border ${comment.role === 'warden' ? 'bg-cyan-50 border-cyan-100' : 'bg-slate-50 border-slate-200'}`}>
                             <p className="font-bold text-gray-700">{comment.authorName} <span className="text-sm font-normal">({comment.role})</span></p>
                             <p className="text-gray-600">{comment.text}</p>
                             <p className="text-xs text-gray-400 mt-1 text-right">{format(new Date(comment.createdAt), 'p, MMMM dd')}</p>
@@ -176,9 +179,10 @@ const WardenGrievance = () => {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   rows="3"
-                  className="p-4 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                  className="p-4 block w-full shadow-sm sm:text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none"
                   placeholder="Add your comment..."></textarea>
-                <button type="submit" disabled={actionLoading} className="cursor-pointer mt-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">
+                <button type="submit" disabled={actionLoading} className="cursor-pointer mt-2 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-700 rounded-md hover:bg-cyan-800 disabled:bg-cyan-300">
+                    <Send className="h-4 w-4" />
                     {actionLoading ? 'Posting...' : 'Post Comment'}
                 </button>
             </form>
@@ -191,24 +195,22 @@ const WardenGrievance = () => {
     return (
       <>
       <div className='mb-6'>
-        <AdminHeader title="Grievance Dashboard" subtitle="View and manage submitted grievances" actions={<FullPageRefreshButton content="Refresh" className="cursor-pointer h-10 flex items-center px-4 py-2 border border-gray-600 text-sm font-medium rounded-md text-gray-200 bg-slate-600 hover:bg-amber-700" />} />
+        <AdminHeader title="Grievance Dashboard" subtitle="View and manage submitted grievances" actions={<FullPageRefreshButton content="Refresh" className="cursor-pointer h-10 flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50" />} />
       </div>
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
           <ul className="divide-y divide-gray-200">
             {grievances.length > 0 ? grievances.map((g) => (
-              <li key={g._id} onClick={() => handleViewDetails(g)} className="p-4 hover:bg-gray-50 cursor-pointer">
+              <li key={g._id} onClick={() => handleViewDetails(g)} className="p-4 hover:bg-cyan-50 cursor-pointer transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-indigo-600 truncate">{g.category}</p>
+                    <p className="text-sm font-medium text-cyan-700 truncate">{g.category}</p>
                     <p className="text-sm text-gray-500 mt-1">
                       By: <span className="font-medium text-gray-700">{g.isAnonymous ? 'Anonymous' : g.studentId?.userName || 'N/A'}</span> on {format(new Date(g.createdAt), 'MMM dd, yyyy')}
                     </p>
                   </div>
                   <div className="flex items-center">
                     <StatusBadge status={g.status} />
-                    <svg className="h-5 w-5 text-gray-400 ml-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                    </svg>
+                    <ChevronRight className="h-5 w-5 text-slate-400 ml-4" />
                   </div>
                 </div>
               </li>
@@ -221,7 +223,18 @@ const WardenGrievance = () => {
     );
   };
 
-  return <div className="max-w-4xl mx-auto p-4 md:p-6">{renderContent()}</div>;
+  return (
+    <div className="min-h-screen bg-slate-50 p-4 md:p-6">
+      <div className="max-w-4xl mx-auto">
+        {notice && (
+          <div className={`mb-4 rounded-lg border p-3 text-sm ${notice.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-800'}`}>
+            {notice.message}
+          </div>
+        )}
+        {renderContent()}
+      </div>
+    </div>
+  );
 };
 
 export default WardenGrievance;

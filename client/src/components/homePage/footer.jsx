@@ -1,5 +1,5 @@
 import { FaLinkedin, FaFacebook, FaTwitterSquare, FaInstagramSquare } from 'react-icons/fa';
-import { ArrowRight,Mail,Phone } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from'react-router';
 
 const Footer = () => {
@@ -94,7 +94,7 @@ const Footer = () => {
               </div>
 
               <div>
-                <Link to='admin/login' >
+                <Link to="/admin/login" >
                 <button className="border-2 cursor-pointer px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors hover:bg-violet-500 m-4">
                   Admin Login
                 </button>
@@ -107,7 +107,7 @@ const Footer = () => {
           <div className="pt-8 border-t border-gray-800 text-center">
             <div className="text-gray-400 text-sm">
               &copy; {new Date().getFullYear()} RSD Hostel. All rights reserved. | 
-              Designed with ❤️ for students
+              Designed with care for students
             </div>
           </div>
         </div>

@@ -2,15 +2,16 @@ import { useState, useEffect } from 'react';
 import FeeStructureCard from './feesStructureCard';
 import axiosClient from '../../config/axiosClient';
 
-const FeeStructureList = () => {
+const FeeStructureList = ({ refreshKey = 0, onChanged }) => {
   const [feeStructures, setFeeStructures] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [notice, setNotice] = useState(null);
 
   // Fetch fee structures on component mount
   useEffect(() => {
     fetchFeeStructures();
-  }, []);
+  }, [refreshKey]);
 
   // Fetch all fee structures from Database. 
   const fetchFeeStructures = async () => {
@@ -35,11 +36,11 @@ const FeeStructureList = () => {
 
       // Remove from state
       setFeeStructures(prev => prev.filter(item => item._id !== id));
+      onChanged?.();
       
-      // Show success message
-      alert('Fee structure deleted successfully');
+      setNotice({ type: 'success', message: 'Fee structure deleted successfully.' });
     } catch (error) {
-      alert(`Delete failed: ${error.message}`);
+      setNotice({ type: 'error', message: `Delete failed: ${error.message}` });
       throw error;
     }
   };
@@ -55,12 +56,12 @@ const FeeStructureList = () => {
           item._id === id ? response?.data?.data : item
         )
       );
+      onChanged?.();
       
-      // Show success message
-      alert('Fee structure updated successfully');
+      setNotice({ type: 'success', message: 'Fee structure updated successfully.' });
       return response?.data?.data;
     } catch (error) {
-      alert(`Update failed: ${error.message}`);
+      setNotice({ type: 'error', message: `Update failed: ${error.message}` });
       throw error;
     }
   };
@@ -102,6 +103,11 @@ const FeeStructureList = () => {
 
   return (
     <div className="space-y-6">
+      {notice && (
+        <div className={`rounded-lg border p-3 text-sm ${notice.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-800'}`}>
+          {notice.message}
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Fee Structures</h2>

@@ -70,7 +70,7 @@ export const logout = createAsyncThunk(
       await axioClient.post('/user/logout');
       return null;
     } catch (error) {
-      return rejectWithValue
+      return rejectWithValue(error.response?.data || { message: 'Logout failed' });
     }
   }
 )

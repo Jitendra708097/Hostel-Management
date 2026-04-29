@@ -13,7 +13,6 @@ import logger from '../../utils/logger';
 
 
 const HomePage = () => {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [menuData, setMenuData] = useState([]);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -29,7 +28,7 @@ const HomePage = () => {
         const response = await axiosClient.get('/menu/show');
         setMenuData(response.data || []);
         logger.success('Fetched menu data', response.data);
-      } catch (e) {
+      } catch {
         setMenuData([]);
       }
     };
@@ -43,13 +42,13 @@ const HomePage = () => {
       className="bg-white rounded-2xl p-6 text-center group transition-all duration-300"
     >
       <div className="relative inline-block mb-4">
-        <img src={image} alt={name} className="w-28 h-28 rounded-full mx-auto object-cover border-4 border-white shadow-lg group-hover:border-primary-100 transition-colors" />
-        <div className="absolute -bottom-2 -right-2 bg-primary-500 text-white p-2 rounded-full">
+        <img src={image} alt={name} className="w-28 h-28 rounded-full mx-auto object-cover border-4 border-white shadow-lg group-hover:border-cyan-100 transition-colors" />
+        <div className="absolute -bottom-2 -right-2 bg-cyan-600 text-white p-2 rounded-full">
           <Users className="w-4 h-4" />
         </div>
       </div>
       <h3 className="text-xl font-bold text-gray-900 mb-1">{name}</h3>
-      <p className="text-primary-600 font-medium mb-3">{title}</p>
+      <p className="text-cyan-700 font-medium mb-3">{title}</p>
       <p className="text-gray-600 text-sm leading-relaxed italic">"{quote}"</p>
     </motion.div>
   );
@@ -154,21 +153,21 @@ const HomePage = () => {
 
       {/* Mobile Navigation */}
       {mobileOpen && (
-        <div className="md:hidden bg-red-600 overflow-x-hidden border-t border-gray-100 shadow-lg">
+        <div className="md:hidden bg-white/95 backdrop-blur-md overflow-x-hidden border-t border-slate-200 shadow-xl">
           <div className="px-4 py-3 space-y-1">
             {['Leadership', 'Facilities', 'Fees', 'Mess', 'Gallery', 'Contact'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToId(item.toLowerCase())}
-                className="w-full text-left py-3 px-2 text-gray-700 font-medium hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                className="w-full text-left py-3 px-3 text-slate-700 font-medium hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors duration-200"
               >
                 {item}
               </button>
             ))}
-            <div className="pt-3 border-t border-gray-100 space-y-2">
+            <div className="pt-3 border-t border-slate-200 space-y-2">
               <Link 
                 to="/login" 
-                className="block text-center py-3 text-gray-700 font-medium hover:text-blue-600 transition-colors duration-200"
+                className="block text-center py-3 text-slate-700 font-medium hover:text-blue-700 transition-colors duration-200"
               >
                 Student Login
               </Link>
@@ -197,7 +196,7 @@ const HomePage = () => {
   return (
     <div className="bg-linear-to-br from-gray-50 to-blue-50 min-h-screen">
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-linear-to-r from-primary-500 to-primary-600 origin-left z-50 shadow-lg"
+        className="fixed top-0 left-0 right-0 h-1 bg-linear-to-r from-blue-600 to-cyan-600 origin-left z-50 shadow-lg"
         style={{ scaleX }}
       />
       
@@ -215,7 +214,7 @@ const HomePage = () => {
   />
   
   {/* Subtle grid pattern */}
-  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size:64px_64px] mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
+  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
   
   <div className="relative z-10 container mx-auto px-6 py-20">
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -223,7 +222,7 @@ const HomePage = () => {
       <div className="text-white space-y-8">
         {/* Badge & Rating */}
         <div className="flex items-center gap-4">
-          <div className="bg-linear-to-r from-blue-600 to-purple-600 text-white px-5 py-2 rounded-full text-sm font-semibold shadow-lg backdrop-blur-sm">
+            <div className="bg-linear-to-r from-blue-600 to-cyan-600 text-white px-5 py-2 rounded-full text-sm font-semibold shadow-lg backdrop-blur-sm">
             PREMIUM HOSTEL
           </div>
           <div className="flex items-center gap-1 text-amber-400">
@@ -237,7 +236,7 @@ const HomePage = () => {
         <div className="space-y-4">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
             <span className="block text-white">Your Home</span>
-            <span className="block text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-400">
+            <span className="block text-transparent bg-clip-text bg-linear-to-r from-cyan-300 to-blue-300">
               Away From Home
             </span>
           </h1>
@@ -266,7 +265,7 @@ const HomePage = () => {
         <div className="flex flex-wrap gap-4 pt-4">
           <Link 
             to="/register" 
-            className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
           >
             <UserPlus className="w-5 h-5" />
             Start Your Journey
@@ -283,11 +282,11 @@ const HomePage = () => {
 
       {/* Image Section */}
       <div className="relative">
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+        <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] max-h-[460px]">
           <img 
             src='https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606074/hostelPhoto_y8m1yl.jpg' 
             alt="Modern Hostel Facilities" 
-            className="w-150px h-150px object-cover" 
+            className="h-full w-full object-cover" 
           />
           <div className="absolute inset-0 bg-linear-to-t from-slate-900/30 to-transparent" />
         </div>
@@ -298,7 +297,7 @@ const HomePage = () => {
             <div className="text-2xl font-bold text-white">500+</div>
             <div className="text-sm text-slate-300">Happy Students</div>
           </div>
-          <div className="text-center bg-linear-to-r from-blue-600 to-purple-600 rounded-2xl p-6 min-w-[120px]">
+          <div className="text-center bg-linear-to-r from-blue-600 to-cyan-600 rounded-2xl p-6 min-w-[120px]">
             <div className="text-2xl font-bold text-white">4.8/5</div>
             <div className="text-sm text-white/90">Rating</div>
           </div>
@@ -323,7 +322,7 @@ const HomePage = () => {
         <SectionWrapper id="leadership" className="bg-black/5">
   <div className="text-center mb-16">
     <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-      Meet Our <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600">Visionary Leaders</span>
+      Meet Our <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-cyan-600">Visionary Leaders</span>
     </h2>
     <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
       Dedicated professionals committed to creating the best student living experience
@@ -331,7 +330,7 @@ const HomePage = () => {
   </div>
 
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-    {LEADERCARD_DATA.map((leader, index) => (
+    {LEADERCARD_DATA.map((leader) => (
       <div 
         key={leader.name}
         className="group bg-white rounded-2xl transition-all duration-300 border  overflow-hidden"
@@ -349,12 +348,12 @@ const HomePage = () => {
         </SectionWrapper>
 
         {/* Fees Section */}
-        <SectionWrapper id="fees" className="bg-linear-to-br from-blue-50 to-indigo-50">
+        <SectionWrapper id="fees" className="bg-linear-to-br from-sky-50 to-cyan-50">
           <FEES />
         </SectionWrapper>
 
         {/* Mess Section */}
-        <SectionWrapper id="mess" className="bg-linear-to-br from-orange-100 to-gray-100">
+        <SectionWrapper id="mess" className="bg-linear-to-br from-slate-50 to-cyan-50">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -362,12 +361,12 @@ const HomePage = () => {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-600 px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
+              <div className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
                 <Utensils className="w-4 h-4" />
                 DINING
               </div>
               <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-                Mess & <span className="text-orange-600">Dining</span>
+                Mess & <span className="text-cyan-700">Dining</span>
               </h2>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                 Healthy, hygienic, and delicious meals served daily
@@ -380,17 +379,17 @@ const HomePage = () => {
                 initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl p-8 shadow-xl border border-orange-100"
+                className="bg-white rounded-2xl p-8 shadow-xl border border-cyan-100"
               >
                 <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                  <div className="w-3 h-8 bg-orange-500 rounded-full"></div>
+                  <div className="w-3 h-8 bg-cyan-600 rounded-full"></div>
                   Mess Timings
                 </h3>
                 <div className="space-y-4">
                   {MESS_TIMINGS.map((timing, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors">
+                    <div key={index} className="flex items-center justify-between p-4 bg-cyan-50 rounded-xl hover:bg-cyan-100 transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                        <div className="w-10 h-10 bg-cyan-600 rounded-lg flex items-center justify-center">
                           <Utensils className="w-5 h-5 text-white" />
                         </div>
                         <div>
@@ -408,10 +407,10 @@ const HomePage = () => {
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl p-8 shadow-xl border border-orange-100"
+                className="bg-white rounded-2xl p-8 shadow-xl border border-cyan-100"
               >
                 <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                  <div className="w-3 h-8 bg-orange-500 rounded-full"></div>
+                  <div className="w-3 h-8 bg-cyan-600 rounded-full"></div>
                   Weekly Menu
                 </h3>
                 
@@ -419,7 +418,7 @@ const HomePage = () => {
                   <div className="hidden md:block">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b-2 border-orange-200">
+                        <tr className="border-b-2 border-cyan-200">
                           <th className="text-left pb-4 font-semibold text-gray-900">Day</th>
                           {['Breakfast', 'Lunch', 'Snack', 'Dinner'].map(meal => (
                             <th key={meal} className="pb-4 font-semibold text-gray-900 text-center">{meal}</th>
@@ -428,7 +427,7 @@ const HomePage = () => {
                       </thead>
                       <tbody>
                         {menuData.map((day) => (
-                          <tr key={day.days} className="border-b border-orange-100 last:border-0">
+                          <tr key={day.days} className="border-b border-cyan-100 last:border-0">
                             <td className="py-4 font-semibold text-gray-900">{day.days}</td>
                             {['Breakfast','Lunch','Snack','Dinner'].map(meal => {
                               const item = day.mealAndItem?.find(m => m.meal.toLowerCase() === meal.toLowerCase());
@@ -447,14 +446,14 @@ const HomePage = () => {
                   {/* Mobile view */}
                   <div className="md:hidden space-y-4">
                     {menuData.map(day => (
-                      <div key={day.days} className="bg-orange-50 p-4 rounded-xl">
+                      <div key={day.days} className="bg-cyan-50 p-4 rounded-xl">
                         <div className="font-bold text-gray-900 mb-3 text-lg">{day.days}</div>
                         <div className="grid grid-cols-2 gap-3">
                           {['Breakfast','Lunch','Snack','Dinner'].map(meal => {
                             const item = day.mealAndItem?.find(m => m.meal.toLowerCase() === meal.toLowerCase());
                             return (
                               <div key={meal} className="bg-white p-3 rounded-lg">
-                                <div className="text-xs text-orange-600 font-semibold mb-1">{meal}</div>
+                                <div className="text-xs text-cyan-700 font-semibold mb-1">{meal}</div>
                                 <div className="text-sm font-medium text-gray-900">{item?.itemName ?? '-'}</div>
                               </div>
                             );
@@ -475,7 +474,7 @@ const HomePage = () => {
         </SectionWrapper>
 
         {/* Contact Section */}
-        <SectionWrapper id="contact" className="bg-linear-to-br from-gray-900 to-indigo-200 text-white">
+        <SectionWrapper id="contact" className="bg-linear-to-br from-slate-950 to-slate-800 text-white">
            <Contact />
         </SectionWrapper>
       </main>

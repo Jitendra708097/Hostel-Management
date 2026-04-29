@@ -1,15 +1,74 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { User, ChevronRight, ServerCrash, Trash2, Edit2, Save, BarChart2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, ServerCrash, Trash2, Edit2, Save, X } from 'lucide-react';
 import axiosClient from '../../config/axiosClient';
 import AdminHeader from './AdminHeader';
 
 // --- Reusable UI Components (Internalized) ---
-const Card = ({ children, className = '' }) => <div className={`bg-white shadow-md rounded-lg p-6 ${className}`}>{children}</div>;
+const Card = ({ children, className = '' }) => <div className={`bg-white shadow-sm border border-slate-200 rounded-lg p-6 ${className}`}>{children}</div>;
 const Button = ({ children, onClick, disabled = false }) => (
-    <button onClick={onClick} disabled={disabled} className="px-4 py-2 font-semibold text-white bg-sky-600 rounded-md shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-60 disabled:cursor-not-allowed">
+    <button onClick={onClick} disabled={disabled} className="inline-flex items-center justify-center gap-2 px-4 py-2 font-semibold text-white bg-cyan-700 rounded-md shadow-sm hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-60 disabled:cursor-not-allowed">
         {children}
     </button>
 );
+
+const getErrorMessage = (err, fallback) => (
+    err?.response?.data?.message ||
+    err?.response?.data?.error ||
+    err?.message ||
+    fallback
+);
+
+const Toast = ({ toast, onClose }) => {
+    if (!toast) return null;
+
+    const styles = {
+        success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+        error: 'border-red-200 bg-red-50 text-red-800',
+        info: 'border-cyan-200 bg-cyan-50 text-cyan-800',
+    };
+    const Icon = toast.type === 'success' ? CheckCircle2 : toast.type === 'error' ? AlertTriangle : Info;
+
+    return (
+        <div className={`fixed right-4 top-4 z-50 flex w-[calc(100vw-2rem)] max-w-md items-start gap-3 rounded-lg border p-4 shadow-lg ${styles[toast.type] || styles.info}`}>
+            <Icon className="mt-0.5 h-5 w-5 shrink-0" />
+            <div className="flex-1">
+                <p className="text-sm font-semibold">{toast.title}</p>
+                {toast.message && <p className="mt-1 text-sm opacity-90">{toast.message}</p>}
+            </div>
+            <button onClick={onClose} className="rounded-md p-1 hover:bg-black/5" aria-label="Dismiss message">
+                <X className="h-4 w-4" />
+            </button>
+        </div>
+    );
+};
+
+const ConfirmActionModal = ({ confirmState, onCancel, onConfirm, isBusy }) => {
+    if (!confirmState) return null;
+
+    return (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
+                <div className="flex items-start gap-3 border-b border-slate-200 p-5">
+                    <div className="rounded-full bg-red-50 p-2 text-red-600">
+                        <AlertTriangle className="h-5 w-5" />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold text-slate-900">{confirmState.title}</h3>
+                        <p className="mt-1 text-sm text-slate-600">{confirmState.message}</p>
+                    </div>
+                </div>
+                <div className="flex justify-end gap-3 p-4">
+                    <button onClick={onCancel} disabled={isBusy} className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60">
+                        Cancel
+                    </button>
+                    <button onClick={onConfirm} disabled={isBusy} className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60">
+                        {isBusy ? 'Working...' : confirmState.confirmLabel}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const StudentManager = () => {
     // State Management
@@ -24,6 +83,18 @@ const StudentManager = () => {
     const [error, setError] = useState(null);
     const [isAssigning, setIsAssigning] = useState(false);
     const [filter, setFilter] = useState('Unassigned'); // 'All' | 'Assigned' | 'Unassigned'
+    const [toast, setToast] = useState(null);
+    const [confirmState, setConfirmState] = useState(null);
+
+    const showToast = useCallback((type, title, message = '') => {
+        setToast({ type, title, message });
+    }, []);
+
+    useEffect(() => {
+        if (!toast) return undefined;
+        const timer = setTimeout(() => setToast(null), 4500);
+        return () => clearTimeout(timer);
+    }, [toast]);
 
     // --- DATA FETCHING ---
     const fetchData = useCallback(async () => {
@@ -41,7 +112,7 @@ const StudentManager = () => {
             setError(null);
         } catch (err) {
             console.error("Failed to fetch data:", err);
-            setError("Could not load students or fee structures. Please ensure the server is running.");
+            setError(getErrorMessage(err, "Could not load students or fee structures. Please ensure the server is running."));
         } finally {
             setLoading(false);
         }
@@ -75,10 +146,10 @@ const StudentManager = () => {
                     setEditValues({});
                 }
             }
-        } catch (err) {
+        } catch {
             // ignore
         }
-    }, [filter, students]);
+    }, [filter, selectedStudent, students]);
 
     // Compute year-wise statistics from fetched students
     const yearStatsArray = useMemo(() => {
@@ -114,42 +185,51 @@ const StudentManager = () => {
         if (!selectedStudent) return;
         try {
             const payload = { userName: editValues.userName, emailId: editValues.emailId };
-            const res = await axiosClient.put(`/user/update/${selectedStudent._id}`, payload);
-            alert('Student updated successfully');
+            const res = await axiosClient.put(`/user/admin/update/${selectedStudent._id}`, payload);
+            showToast('success', 'Student updated', `${payload.userName || 'Student'} was updated successfully.`);
             // refresh
             await fetchData();
             // re-select updated student object from refreshed list
-            const updated = students.find(s => s._id === selectedStudent._id) || res.data.data || selectedStudent;
+            const updated = students.find(s => s._id === selectedStudent._id) || res.data.user || selectedStudent;
             setSelectedStudent(updated);
             setIsEditing(false);
         } catch (err) {
             console.error('Update failed', err);
-            alert(err.response?.data?.message || 'Failed to update student');
+            showToast('error', 'Update failed', getErrorMessage(err, 'Failed to update student.'));
         }
     };
 
+    const requestDeleteStudent = (studentId, studentName = 'this student') => {
+        setConfirmState({
+            type: 'delete',
+            studentId,
+            title: 'Delete student?',
+            message: `This will permanently delete ${studentName}. This action cannot be undone.`,
+            confirmLabel: 'Delete student',
+        });
+    };
+
     const handleDeleteStudent = async (studentId) => {
-        const ok = confirm('Are you sure you want to delete this student? This action cannot be undone.');
-        if (!ok) return;
         setIsDeleting(true);
         try {
             await axiosClient.delete(`/user/delete/${studentId}`);
-            alert('Student deleted');
+            showToast('success', 'Student deleted', 'The student record has been removed.');
             // refresh list
             await fetchData();
             setSelectedStudent(null);
         } catch (err) {
             console.error('Delete failed', err);
-            alert(err.response?.data?.message || 'Failed to delete student');
+            showToast('error', 'Delete failed', getErrorMessage(err, 'Failed to delete student.'));
         } finally {
             setIsDeleting(false);
+            setConfirmState(null);
         }
     };
     
     // --- ASSIGNMENT LOGIC ---
     const handleAssignStructure = async () => {
         if (!selectedStudent || !selectedStructureId) {
-            alert("Please select a student and a fee structure.");
+            showToast('info', 'Selection needed', 'Please select a student and a fee structure.');
             return;
         }
         setIsAssigning(true);
@@ -160,49 +240,75 @@ const StudentManager = () => {
                 feeStructureId: selectedStructureId,
             });
 
-            alert(`Successfully assigned structure to ${selectedStudent.userName}.`);
+            showToast('success', 'Fee structure assigned', `Successfully assigned structure to ${selectedStudent.userName}.`);
             // Refresh data to show the change
             fetchData();
             setSelectedStudent(null); // Deselect student after successful assignment
 
         } catch (error) {
             console.error("Failed to assign structure:", error);
-            alert(error.response?.data?.message || "An error occurred during assignment.");
+            showToast('error', 'Assignment failed', getErrorMessage(error, 'An error occurred during assignment.'));
         } finally {
             setIsAssigning(false);
         }
     };
 
     // Unassign a fee structure from a student (clear assignment)
+    const requestUnassignStudent = (studentId, studentName = 'this student') => {
+        setConfirmState({
+            type: 'unassign',
+            studentId,
+            title: 'Unassign fee structure?',
+            message: `This will remove the current fee structure and reset dues for ${studentName}.`,
+            confirmLabel: 'Unassign',
+        });
+    };
+
     const handleUnassignStudent = async (studentId) => {
-        const ok = confirm('Are you sure you want to unassign the fee structure from this student?');
-        if (!ok) return;
+        setIsDeleting(true);
         try {
             // Use the update endpoint to clear feeStructure and dues
-            await axiosClient.put(`/user/update/${studentId}`, { feeStructure: null, totalDues: 0 });
-            alert('Fee structure unassigned successfully.');
+            await axiosClient.put(`/user/admin/update/${studentId}`, { feeStructure: null, totalDues: 0 });
+            showToast('success', 'Fee structure unassigned', 'The student is now marked as unassigned.');
             await fetchData();
             setSelectedStudent(null);
         } catch (err) {
             console.error('Unassign failed', err);
-            alert(err.response?.data?.message || 'Failed to unassign fee structure');
+            showToast('error', 'Unassign failed', getErrorMessage(err, 'Failed to unassign fee structure.'));
+        } finally {
+            setIsDeleting(false);
+            setConfirmState(null);
+        }
+    };
+
+    const handleConfirmAction = () => {
+        if (!confirmState) return;
+        if (confirmState.type === 'delete') {
+            handleDeleteStudent(confirmState.studentId);
+        } else if (confirmState.type === 'unassign') {
+            handleUnassignStudent(confirmState.studentId);
         }
     };
 
     // --- UI RENDERING LOGIC ---
     if (loading) return <div className="p-8 text-center">Loading student data...</div>;
     if (error) return (
-        <div className="p-8">
+        <div className="bg-slate-50 min-h-screen p-8">
             <Card className="text-center border-l-4 border-red-500">
                 <ServerCrash className="w-12 h-12 mx-auto text-red-500 mb-4" />
                 <h2 className="text-xl font-bold text-gray-800">Failed to Load Data</h2>
                 <p className="text-gray-600">{error}</p>
+                <button onClick={fetchData} className="mt-5 rounded-md bg-cyan-700 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-800">
+                    Try again
+                </button>
             </Card>
         </div>
     );
 
     return (
         <div className="bg-slate-50 min-h-screen p-4 sm:p-6 lg:p-8">
+            <Toast toast={toast} onClose={() => setToast(null)} />
+            <ConfirmActionModal confirmState={confirmState} onCancel={() => setConfirmState(null)} onConfirm={handleConfirmAction} isBusy={isDeleting} />
             <AdminHeader title="Student Fee Management" subtitle="Assign structures, view payments and manage students" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* Stats Panel */}
@@ -237,7 +343,7 @@ const StudentManager = () => {
                         <div className="flex gap-3 overflow-x-auto py-1">
                             {yearStatsArray.length > 0 ? (
                                 yearStatsArray.map(y => (
-                                    <div key={y.year} className="bg-slate-100 p-3 rounded-md min-w-[140px]">
+                            <div key={y.year} className="bg-slate-50 border border-slate-200 p-3 rounded-md min-w-[140px]">
                                         <p className="text-xs text-gray-500">Year {y.year}</p>
                                         <p className="text-2xl font-bold text-gray-800">{y.total}</p>
                                         <p className="text-sm text-gray-600">Assigned: <span className="text-sky-600 font-semibold">{y.assigned}</span></p>
@@ -256,7 +362,7 @@ const StudentManager = () => {
                     <h3 className="text-lg font-semibold mb-3">Students with Full Payment</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {students.filter(s => Number(s.due) === 0 && (s.feeStructure?.totalAmount ?? 0) > 0).map(s => (
-                            <div key={s._id} className="flex items-center gap-3 bg-white p-3 rounded-md shadow-sm">
+                            <div key={s._id} className="flex items-center gap-3 bg-slate-50 border border-slate-200 p-3 rounded-md">
                                 <img src={s.profileURL} alt={s.userName} className="w-12 h-12 rounded-full object-cover" />
                                 <div className="flex-1">
                                     <p className="font-medium text-gray-800">{s.userName}</p>
@@ -278,9 +384,9 @@ const StudentManager = () => {
                 <Card className="md:col-span-1">
                     <h2 className="text-xl font-semibold mb-4">Students</h2>
                     <div className="flex gap-2 mb-3">
-                        <button onClick={() => setFilter('Unassigned')} className={`px-3 py-1 rounded-md ${filter==='Unassigned' ? 'bg-sky-600 text-white' : 'bg-white text-gray-700 border'}`}>Unassigned</button>
-                        <button onClick={() => setFilter('Assigned')} className={`px-3 py-1 rounded-md ${filter==='Assigned' ? 'bg-sky-600 text-white' : 'bg-white text-gray-700 border'}`}>Assigned</button>
-                        <button onClick={() => setFilter('All')} className={`px-3 py-1 rounded-md ${filter==='All' ? 'bg-sky-600 text-white' : 'bg-white text-gray-700 border'}`}>All</button>
+                        <button onClick={() => setFilter('Unassigned')} className={`px-3 py-1 rounded-md text-sm font-medium ${filter==='Unassigned' ? 'bg-cyan-700 text-white' : 'bg-white text-gray-700 border border-slate-300 hover:bg-slate-50'}`}>Unassigned</button>
+                        <button onClick={() => setFilter('Assigned')} className={`px-3 py-1 rounded-md text-sm font-medium ${filter==='Assigned' ? 'bg-cyan-700 text-white' : 'bg-white text-gray-700 border border-slate-300 hover:bg-slate-50'}`}>Assigned</button>
+                        <button onClick={() => setFilter('All')} className={`px-3 py-1 rounded-md text-sm font-medium ${filter==='All' ? 'bg-cyan-700 text-white' : 'bg-white text-gray-700 border border-slate-300 hover:bg-slate-50'}`}>All</button>
                     </div>
                     <ul className="divide-y divide-gray-200 max-h-[360px] sm:max-h-[600px] overflow-y-auto">
                         {students
@@ -291,16 +397,16 @@ const StudentManager = () => {
                                 return true;
                             })
                             .map(student => (
-                            <li key={student._id} className={`p-3 flex justify-between items-center hover:bg-sky-50 rounded-md ${selectedStudent?._id === student._id ? 'bg-sky-100' : ''}`}>
+                            <li key={student._id} className={`p-3 flex justify-between items-center hover:bg-cyan-50 rounded-md ${selectedStudent?._id === student._id ? 'bg-cyan-50 ring-1 ring-cyan-200' : ''}`}>
                                 <div className="flex-1 cursor-pointer" onClick={() => handleSelectStudent(student)}>
                                     <p className="font-medium text-gray-800">{student.userName}</p>
                                     <p className="text-sm text-gray-500">{student.emailId}</p>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <button title="Edit" onClick={() => handleSelectStudent(student)} className="p-2 rounded text-sky-600 hover:bg-sky-50">
+                                    <button title="Edit" onClick={() => handleSelectStudent(student)} className="p-2 rounded text-cyan-700 hover:bg-cyan-50">
                                         <Edit2 className="w-4 h-4" />
                                     </button>
-                                    <button title="Delete" onClick={() => handleDeleteStudent(student._id)} className="p-2 rounded text-red-600 hover:bg-red-50">
+                                    <button title="Delete" onClick={() => requestDeleteStudent(student._id, student.userName)} className="p-2 rounded text-red-600 hover:bg-red-50">
                                         <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -338,16 +444,16 @@ const StudentManager = () => {
                                                 <button className="px-3 py-2 rounded-md bg-gray-200" onClick={() => { setIsEditing(false); setEditValues({ userName: selectedStudent.userName, emailId: selectedStudent.emailId }); }}>Cancel</button>
                                             </>
                                         ) : (
-                                            <button className="px-3 py-2 rounded-md bg-sky-50 text-sky-700" onClick={() => setIsEditing(true)}><Edit2 className="w-4 h-4" /> Edit</button>
-                                        )}
-                                        {selectedStudent?.feeStructure ? (
-                                            <button className="px-3 py-2 rounded-md bg-yellow-50 text-yellow-700" onClick={() => handleUnassignStudent(selectedStudent._id)}>Unassign</button>
+                                        <button className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-50 text-cyan-700" onClick={() => setIsEditing(true)}><Edit2 className="w-4 h-4" /> Edit</button>
+                                    )}
+                                    {selectedStudent?.feeStructure ? (
+                                            <button className="px-3 py-2 rounded-md bg-amber-50 text-amber-700" onClick={() => requestUnassignStudent(selectedStudent._id, selectedStudent.userName)}>Unassign</button>
                                         ) : null}
-                                        <button className="px-3 py-2 rounded-md bg-red-50 text-red-600" onClick={() => handleDeleteStudent(selectedStudent._id)} disabled={isDeleting}><Trash2 className="w-4 h-4" /></button>
+                                        <button className="px-3 py-2 rounded-md bg-red-50 text-red-600" onClick={() => requestDeleteStudent(selectedStudent._id, selectedStudent.userName)} disabled={isDeleting}><Trash2 className="w-4 h-4" /></button>
                                     </div>
                                 </div>
                                 <p className="text-gray-600 mt-2">
-                                    Current Structure: <strong className="text-sky-700">{selectedStudent.feeStructure?.structureName || 'Not Assigned'}</strong>
+                                    Current Structure: <strong className="text-cyan-700">{selectedStudent.feeStructure?.structureName || 'Not Assigned'}</strong>
                                 </p>
                             </div>
                             <div className="space-y-2">
@@ -358,7 +464,7 @@ const StudentManager = () => {
                                     id="fee-structure-select"
                                     value={selectedStructureId}
                                     onChange={(e) => setSelectedStructureId(e.target.value)}
-                                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm rounded-md"
+                                    className="mt-1 block w-full rounded-md border border-slate-300 bg-white py-2 pl-3 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
                                 >
                                     <option value="">-- Choose a structure --</option>
                                     {structures.map(s => (
@@ -374,7 +480,7 @@ const StudentManager = () => {
                         </div>
                     ) : (
                         <div className="flex items-center justify-center h-full text-center text-gray-500">
-                            <User className="w-16 h-16 mb-4" />
+                            <Info className="w-16 h-16 mb-4" />
                             <p>Select a student from the list to manage their fee structure.</p>
                         </div>
                     )}

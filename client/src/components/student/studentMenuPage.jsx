@@ -1,32 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Coffee, Moon, RefreshCw, Salad, Soup, Utensils } from 'lucide-react';
 import axiosClient from '../../config/axiosClient';
+
+const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+const getCurrentDay = () => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return days[new Date().getDay()];
+};
+
+const mealMeta = {
+  breakfast: { icon: Coffee, tone: 'bg-amber-50 text-amber-700 border-amber-200' },
+  lunch: { icon: Salad, tone: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  snack: { icon: Soup, tone: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
+  dinner: { icon: Moon, tone: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+};
 
 const WeeklyMenuPage = () => {
   const [menuData, setMenuData] = useState([]);
-  const [selectedDay, setSelectedDay] = useState('');
+  const [selectedDay, setSelectedDay] = useState(getCurrentDay());
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
 
-  // Days of the week
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-  // Get current day
-  const getCurrentDay = () => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const today = new Date().getDay();
-    return days[today];
-  };
-
-  // Fetch menu data from backend
   const fetchMenuData = async () => {
     try {
       setLoading(true);
-      const response = await axiosClient.get('/menu/show'); // Replace with your API endpoint
-      setMenuData(response.data);
-      setSelectedDay(getCurrentDay());
+      setError('');
+      const response = await axiosClient.get('/menu/show');
+      setMenuData(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-      setError('Failed to fetch menu data');
       console.error('Error fetching menu:', err);
+      setError(err?.response?.data?.message || 'Failed to fetch menu data.');
     } finally {
       setLoading(false);
     }
@@ -36,196 +40,141 @@ const WeeklyMenuPage = () => {
     fetchMenuData();
   }, []);
 
-  // Get today's menu by default
-  useEffect(() => {
-    if (menuData.length > 0 && !selectedDay) {
-      setSelectedDay(getCurrentDay());
-    }
-  }, [menuData, selectedDay]);
+  const currentMenu = useMemo(
+    () => menuData.find((menu) => menu.days === selectedDay),
+    [menuData, selectedDay]
+  );
 
-  // Get selected day's menu
-  const getSelectedDayMenu = () => {
-    return menuData.find(menu => menu.days === selectedDay);
-  };
+  const groupedMeals = useMemo(() => {
+    if (!currentMenu?.mealAndItem) return {};
 
-  // Group meals by type for a specific day
-  const groupMealsByType = (dayMenu) => {
-    if (!dayMenu || !dayMenu.mealAndItem) return {};
-    
-    return dayMenu.mealAndItem.reduce((acc, item) => {
-      const mealType = item.meal.toLowerCase();
-      if (!acc[mealType]) {
-        acc[mealType] = [];
-      }
+    return currentMenu.mealAndItem.reduce((acc, item) => {
+      const mealType = item.meal?.toLowerCase() || 'meal';
+      if (!acc[mealType]) acc[mealType] = [];
       acc[mealType].push(item);
       return acc;
     }, {});
-  };
-
-  // Get icon for meal type
-  const getMealIcon = (mealType) => {
-    const icons = {
-      breakfast: '🍳',
-      lunch: '🍽️',
-      snack: '☕',
-      dinner: '🌙'
-    };
-    return icons[mealType] || '📋';
-  };
-
-  // Get color for meal type
-  const getMealColor = (mealType) => {
-    const colors = {
-      breakfast: 'from-orange-400 to-amber-500',
-      lunch: 'from-green-500 to-emerald-600',
-      snack: 'from-yellow-500 to-amber-500',
-      dinner: 'from-purple-500 to-indigo-600'
-    };
-    return colors[mealType] || 'from-blue-500 to-cyan-600';
-  };
+  }, [currentMenu]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-slate-50 p-8">
+        <div className="mx-auto max-w-5xl rounded-lg border border-slate-200 bg-white p-8 text-center text-slate-600 shadow-sm">
+          Loading weekly menu...
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center text-red-500 p-4">
-        {error}
-        <button 
-          onClick={fetchMenuData}
-          className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          Retry
-        </button>
+      <div className="min-h-screen bg-slate-50 p-8">
+        <div className="mx-auto max-w-2xl rounded-lg border border-red-200 bg-red-50 p-6 text-center text-red-700">
+          <p>{error}</p>
+          <button
+            type="button"
+            onClick={fetchMenuData}
+            className="mt-4 inline-flex items-center gap-2 rounded-md bg-cyan-700 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-800"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
 
-  const currentMenu = getSelectedDayMenu();
-  const groupedMeals = groupMealsByType(currentMenu);
-
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6">
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-8">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-8">
+          <p className="text-sm font-medium text-cyan-700">Mess Menu</p>
+          <h1 className="text-3xl font-bold text-slate-900">Weekly Food Schedule</h1>
+          <p className="mt-1 text-slate-600">Check meals planned for each day of the week.</p>
+        </header>
 
-      {/* Day Selection Buttons */}
-      <div className="flex flex-wrap justify-center gap-2 mb-8">
-        {daysOfWeek.map(day => (
-          <button
-            key={day}
-            onClick={() => setSelectedDay(day)}
-            className={`cursor-pointer px-4 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 ${
-              selectedDay === day
-                ? 'bg-linear-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:shadow-md'
-            }`}
-          >
-            <span>{day}</span>
-            {day === getCurrentDay() && (
-              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                Today
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Menu Display */}
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-        {/* Day Header */}
-        <div className="bg-linear-to-r from-blue-600 to-purple-700 text-white p-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h2 className="text-2xl font-bold">{selectedDay}'s Menu</h2>
-              <p className="text-blue-100 mt-1">Fresh and nutritious meals</p>
-            </div>
-            {selectedDay === getCurrentDay() && (
-              <span className="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
-                🎯 Available Today
-              </span>
-            )}
-          </div>
+        <div className="mb-8 flex flex-wrap gap-2">
+          {daysOfWeek.map((day) => (
+            <button
+              key={day}
+              type="button"
+              onClick={() => setSelectedDay(day)}
+              className={`cursor-pointer rounded-md border px-4 py-2 text-sm font-semibold transition ${
+                selectedDay === day
+                  ? 'border-cyan-700 bg-cyan-700 text-white shadow-sm'
+                  : 'border-slate-200 bg-white text-slate-700 hover:border-cyan-300 hover:text-cyan-700'
+              }`}
+            >
+              {day}
+              {day === getCurrentDay() && (
+                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${selectedDay === day ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-700'}`}>
+                  Today
+                </span>
+              )}
+            </button>
+          ))}
         </div>
 
-        {/* Menu Content */}
-        <div className="p-6">
-          {currentMenu ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {Object.entries(groupedMeals).map(([mealType, items]) => (
-                <div 
-                  key={mealType} 
-                  className="bg-linear-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className={`inline-flex items-center px-4 py-2 rounded-full bg-linear-to-r ${getMealColor(mealType)} text-white mb-4`}>
-                    <span className="text-lg mr-2">{getMealIcon(mealType)}</span>
-                    <h3 className="text-lg font-bold capitalize">
-                      {mealType}
-                    </h3>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {items.map((item, index) => (
-                      <div 
-                        key={item._id} 
-                        className="bg-white rounded-xl p-4 border border-gray-100 hover:border-blue-200 transition-all duration-200 group"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-800 text-lg group-hover:text-blue-600 transition-colors">
-                              {item.itemName}
-                            </h4>
-                            {/* You can add additional details here if available */}
-                          </div>
-                          <div className="ml-4 shrink-0">
-                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-500 transition-colors">
-                              <span className="text-blue-500 group-hover:text-white text-sm font-bold">
-                                {index + 1}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+        <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 bg-linear-to-r from-blue-700 to-cyan-600 p-6 text-white">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-bold">{selectedDay}'s Menu</h2>
+                <p className="text-sky-100">Fresh meals from the hostel mess.</p>
+              </div>
+              {selectedDay === getCurrentDay() && (
+                <span className="inline-flex w-fit items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm font-semibold text-white">
+                  <Utensils className="h-4 w-4" />
+                  Available Today
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="p-6">
+            {currentMenu && Object.keys(groupedMeals).length > 0 ? (
+              <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                {Object.entries(groupedMeals).map(([mealType, items]) => {
+                  const meta = mealMeta[mealType] || { icon: Utensils, tone: 'bg-slate-50 text-slate-700 border-slate-200' };
+                  const Icon = meta.icon;
+                  return (
+                    <div key={mealType} className="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                      <div className={`mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold capitalize ${meta.tone}`}>
+                        <Icon className="h-4 w-4" />
+                        {mealType}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">🍽️</div>
-              <p className="text-gray-500 text-xl">Menu not available for {selectedDay}</p>
-              <p className="text-gray-400 mt-2">Please check back later</p>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="bg-gray-50 border-t border-gray-200 p-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
-            <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-              <span>Fresh ingredients daily</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-              <span>Customizable options available</span>
-            </div>
+                      <div className="space-y-3">
+                        {items.map((item, index) => (
+                          <div key={item._id || `${mealType}-${index}`} className="flex items-center justify-between rounded-md border border-slate-200 bg-white p-3">
+                            <span className="font-medium text-slate-900">{item.itemName}</span>
+                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-50 text-xs font-bold text-cyan-700">{index + 1}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="py-12 text-center">
+                <Utensils className="mx-auto mb-3 h-10 w-10 text-slate-300" />
+                <p className="text-lg font-semibold text-slate-700">Menu not available for {selectedDay}</p>
+                <p className="mt-1 text-slate-500">Please check back after the mess menu is updated.</p>
+              </div>
+            )}
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Quick Navigation */}
-      <div className="flex justify-center mt-8">
-        <button
-          onClick={() => setSelectedDay(getCurrentDay())}
-          className="cursor-pointer px-6 py-3 bg-linear-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105 font-semibold"
-        >
-          🔄 Back to Today's Menu
-        </button>
+        <div className="mt-6 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setSelectedDay(getCurrentDay())}
+            className="cursor-pointer inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-cyan-300 hover:text-cyan-700"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Back to Today's Menu
+          </button>
+        </div>
       </div>
     </div>
   );

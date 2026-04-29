@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format, isBefore, parseISO, startOfToday } from 'date-fns';
-import { ChevronDown, Send, CheckCircle, XCircle, Clock, Paperclip, History } from 'lucide-react';
+import { AlertCircle, ChevronDown, Send, CheckCircle, XCircle, Clock, Paperclip, History, X } from 'lucide-react';
 import axiosClient from "../../config/axiosClient";
 import { useSelector } from 'react-redux';
 
@@ -45,7 +45,7 @@ const GatePass = ({ student, application }) => (
 );
 
 const StatusPill = ({ status }) => {
-    const styles = { Approved: 'bg-teal-500/20 text-teal-300', Rejected: 'bg-red-500/20 text-red-300', Pending: 'bg-yellow-500/20 text-yellow-300' };
+    const styles = { Approved: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200', Rejected: 'bg-red-50 text-red-700 ring-1 ring-red-200', Pending: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200' };
     const Icon = { Approved: CheckCircle, Rejected: XCircle, Pending: Clock }[status];
     return (<span className={`flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full ${styles[status]}`}><Icon className="w-4 h-4" />{status}</span>);
 };
@@ -55,6 +55,7 @@ const StudentLeaveDashboard = () => {
     const [applications, setApplications] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [notice, setNotice] = useState(null);
     const [isFormVisible, setIsFormVisible] = useState(false);
     const { user } = useSelector(( state ) => state.auth);
 
@@ -67,37 +68,39 @@ const StudentLeaveDashboard = () => {
     useEffect(() => {
         const fetchApplications = async () => {
             try {
-                const response = await axiosClient.get(`/leave/check/${user?._id}`);
+                if (!user?._id) return;
+                const response = await axiosClient.get(`/leave/check/${user._id}`);
                 setApplications(response.data.data);
-            } catch (err) {
+                setError(null);
+            } catch {
                 setError('Failed to fetch leave applications.');
             } finally {
                 setIsLoading(false);
             }
         };
         fetchApplications();
-    }, []);
+    }, [user?._id]);
 
     // form submission handler 
     const onSubmit = async (data) => {
         try {
             const response = await axiosClient.post(`/leave/request/${user?._id}`,data);
-            alert('Leave application submitted successfully!');
+            setApplications(prev => [response.data.data, ...prev]);
+            setNotice({ type: 'success', message: 'Leave application submitted successfully.' });
             reset();
             setIsFormVisible(false);
-            // Here you would refetch the applications
         } catch (err) {
-            alert('Failed to submit application.');
+            setNotice({ type: 'error', message: err?.response?.data?.error || err?.response?.data?.message || 'Failed to submit application.' });
         }
     };
 
     // logic to categorize applications and get active gate pass
     const today = startOfToday();
     const activeGatePassApp = applications.find(app => 
-        app.status === 'Approved' && 
-        app.gatePass?.passId && isBefore(today, parseISO(app.startDate))
-        //  && // Leave has started
-        // isBefore(today, parseISO(app.endDate)) // Leave has not ended
+        app.status === 'Approved' &&
+        app.gatePass?.passId &&
+        !isBefore(today, parseISO(app.startDate)) &&
+        !isBefore(parseISO(app.endDate), today)
     );
 
 
@@ -118,15 +121,15 @@ const StudentLeaveDashboard = () => {
                 <p className="text-gray-500 text-center py-4">No applications in this category.</p>
             ) : (
                 apps.map(app => (
-                    <div key={app._id} className="bg-gray-800 rounded-lg p-5 border-l-4 border-gray-700 hover:border-teal-500 transition-colors">
+                    <div key={app._id} className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm hover:border-cyan-300 hover:shadow-md transition-all">
                         <div className="flex flex-wrap justify-between items-center gap-2">
                             <div>
-                                <p className="font-bold text-lg text-gray-200">{format(parseISO(app.startDate), 'dd MMM yyyy')} - {format(parseISO(app.endDate), 'dd MMM yyyy')}</p>
-                                <p className="text-gray-400 text-sm">{app.reason}</p>
+                                <p className="font-bold text-lg text-slate-900">{format(parseISO(app.startDate), 'dd MMM yyyy')} - {format(parseISO(app.endDate), 'dd MMM yyyy')}</p>
+                                <p className="text-slate-600 text-sm">{app.reason}</p>
                             </div>
                             <StatusPill status={app.status} />
                         </div>
-                        {app.wardenComment && (<div className="mt-3 pt-3 border-t border-gray-700"><p className="text-sm text-gray-400"><strong>Warden's Comment:</strong> {app.wardenComment}</p></div>)}
+                        {app.wardenComment && (<div className="mt-3 pt-3 border-t border-slate-200"><p className="text-sm text-slate-600"><strong>Warden's Comment:</strong> {app.wardenComment}</p></div>)}
                     </div>
                 ))
             )}
@@ -134,24 +137,39 @@ const StudentLeaveDashboard = () => {
     );
     
     return (
-        <div className="bg-gray-100 text-gray-700 min-h-screen p-4 sm:p-8 font-sans">
+        <div className="bg-slate-50 text-slate-700 min-h-screen p-4 sm:p-8 font-sans">
             <div className="max-w-4xl mx-auto">
-                {/* <header className="mb-8">
-                    <h1 className="text-4xl font-bold text-teal-400">Student Leave Portal</h1>
-                    <p className="text-gray-400 mt-1">Manage your leave applications and view your gate pass.</p>
-                </header> */}
+                <header className="mb-8">
+                    <p className="text-sm font-medium text-cyan-700">Leave Application</p>
+                    <h1 className="text-3xl font-bold text-slate-900">Student Leave Portal</h1>
+                    <p className="text-slate-600 mt-1">Apply for leave and track warden approval status.</p>
+                </header>
+
+                {notice && (
+                    <div className={`mb-5 flex items-center justify-between rounded-lg border p-3 text-sm ${notice.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-800'}`}>
+                        <span>{notice.message}</span>
+                        <button onClick={() => setNotice(null)} aria-label="Dismiss message"><X className="h-4 w-4" /></button>
+                    </div>
+                )}
+
+                {error && (
+                    <div className="mb-5 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                        <AlertCircle className="h-4 w-4" />
+                        {error}
+                    </div>
+                )}
 
                 {activeGatePassApp && (
                     <section className="mb-10">
-                        <h2 className="text-2xl font-semibold mb-4 text-gray-200">Your Active Gate Pass</h2>
+                        <h2 className="text-2xl font-semibold mb-4 text-slate-900">Your Active Gate Pass</h2>
                         <GatePass student={user} application={activeGatePassApp} />
                     </section>
                 )}
 
-                <section className="mb-10 bg-gray-100 rounded-lg shadow-lg">
+                <section className="mb-10 bg-white rounded-lg shadow-sm border border-slate-200">
                     <button onClick={() => setIsFormVisible(!isFormVisible)} className="w-full flex justify-between items-center p-4 text-left">
-                        <h2 className="text-xl font-semibold text-gray-600">Apply for New Leave</h2>
-                        <ChevronDown className={`w-6 h-6 text-gray-400 transition-transform ${isFormVisible ? 'rotate-180' : ''}`} />
+                        <h2 className="text-xl font-semibold text-slate-900">Apply for New Leave</h2>
+                        <ChevronDown className={`w-6 h-6 text-slate-400 transition-transform ${isFormVisible ? 'rotate-180' : ''}`} />
                     </button>
                     {isFormVisible && (
                         <form onSubmit={handleSubmit(onSubmit)} className="p-6 pt-0 space-y-4">
@@ -159,22 +177,22 @@ const StudentLeaveDashboard = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="startDate" className="block text-sm font-medium text-gray-800 mb-1">Start Date</label>
-                                    <input type="date" {...register('startDate')} className="w-full bg-gray-100 border border-gray-600 rounded-md p-2" />
-                                    {errors.startDate && <p className="text-red-400 text-xs mt-1">{errors.startDate.message}</p>}
+                                    <input type="date" {...register('startDate')} className="w-full bg-white border border-slate-300 rounded-md p-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30 outline-none" />
+                                    {errors.startDate && <p className="text-red-600 text-xs mt-1">{errors.startDate.message}</p>}
                                 </div>
                                 <div>
                                     <label htmlFor="endDate" className="block text-sm font-medium text-gray-800 mb-1">End Date</label>
-                                    <input type="date" {...register('endDate')} className="w-full bg-gray-100 border border-gray-600 rounded-md p-2" />
-                                    {errors.endDate && <p className="text-red-400 text-xs mt-1">{errors.endDate.message}</p>}
+                                    <input type="date" {...register('endDate')} className="w-full bg-white border border-slate-300 rounded-md p-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30 outline-none" />
+                                    {errors.endDate && <p className="text-red-600 text-xs mt-1">{errors.endDate.message}</p>}
                                 </div>
                             </div>
                             <div>
                                 <label htmlFor="reason" className="block text-sm font-medium text-gray-800 mb-1">Reason for Leave</label>
-                                <textarea {...register('reason')} rows="4" className="w-full bg-gray-100 border border-gray-600 rounded-md p-2"></textarea>
-                                {errors.reason && <p className="text-red-400 text-xs mt-1">{errors.reason.message}</p>}
+                                <textarea {...register('reason')} rows="4" className="w-full bg-white border border-slate-300 rounded-md p-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30 outline-none"></textarea>
+                                {errors.reason && <p className="text-red-600 text-xs mt-1">{errors.reason.message}</p>}
                             </div>
                             <div className="text-right">
-                                <button type="submit" className="cursor-pointer inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md"><Send className="w-4 h-4" /> Submit</button>
+                                <button type="submit" className="cursor-pointer inline-flex items-center gap-2 bg-cyan-700 hover:bg-cyan-800 text-white font-bold py-2 px-4 rounded-md"><Send className="w-4 h-4" /> Submit</button>
                             </div>
                         </form>
                     )}
@@ -182,13 +200,13 @@ const StudentLeaveDashboard = () => {
                 
                 {/* --- Pending & Upcoming Section --- */}
                 <section className="mb-10">
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-700 flex items-center gap-2"><Clock className="w-6 h-6 text-teal-400" /> Pending & Upcoming Applications</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-slate-900 flex items-center gap-2"><Clock className="w-6 h-6 text-cyan-600" /> Pending & Upcoming Applications</h2>
                     {isLoading ? <p>Loading...</p> : <ApplicationList apps={pendingAndUpcomingApps} />}
                 </section>
 
                 {/* --- History Section --- */}
                 <section>
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-700 flex items-center gap-2"><History className="w-6 h-6 text-teal-400" /> Leave History</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-slate-900 flex items-center gap-2"><History className="w-6 h-6 text-cyan-600" /> Leave History</h2>
                     {isLoading ? <p>Loading...</p> : <ApplicationList apps={pastApps} />}
                 </section>
             </div>

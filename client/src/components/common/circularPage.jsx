@@ -3,16 +3,33 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import axiosClient from '../../config/axiosClient';
+import AdminHeader from '../admin/AdminHeader';
 
 // Import icons from lucide-react
-import { Upload, Camera, Loader2, FileCheck, XCircle } from 'lucide-react';
+import { Upload, Loader2, FileCheck, XCircle } from 'lucide-react';
 
 // --- Zod Schema for Validation ---
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf', 'video/mp4', 'video/webm'];
 
-// A unique key for your form's data in localStorage
-const FORM_STORAGE_KEY = 'circular-form-draft';
+const dataUrlLooksLikePdf = (value = '') => value.startsWith('data:application/pdf');
+const dataUrlLooksLikeVideo = (value = '') => value.startsWith('data:video/');
+const urlLooksLikePdf = (value = '') => {
+    const cleanUrl = value.split('?')[0].split('#')[0].toLowerCase();
+    return cleanUrl.endsWith('.pdf') || cleanUrl.includes('/raw/upload/');
+};
+const isPdfCircular = (circular = {}) => (
+    circular.mimeType === 'application/pdf' ||
+    circular.resourceType === 'raw' ||
+    urlLooksLikePdf(circular.circularURL || '')
+);
+const getCircularFileUrl = (circular = {}) => {
+    if (isPdfCircular(circular) && circular._id) {
+        return `${axiosClient.defaults.baseURL}/circular/view/${circular._id}`;
+    }
+
+    return circular.circularURL;
+};
 
 const circularSchema = z.object({
   title: z.string().min(3, { message: 'Title must be at least 3 characters long.' }),
@@ -23,7 +40,7 @@ const circularSchema = z.object({
     .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
     .refine(
       (files) => ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
-      'Only .jpg, .png, .webp, and .pdf files are accepted.'
+      'Only .jpg, .png, .webp, .pdf, .mp4, and .webm files are accepted.'
     ),
 });
 
@@ -37,19 +54,20 @@ const CircularsPage = ({ isAdmin }) => {
 
     // State for the view modal
     const [modalOpen, setModalOpen] = useState(false);
-    const [selectedCircularUrl, setSelectedCircularUrl] = useState('');
+    const [selectedCircular, setSelectedCircular] = useState(null);
     
     // State for upload process feedback
     const [isUploading, setIsUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState('');
     const [uploadError, setUploadError] = useState('');
+    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
     // State for file preview
     const [preview, setPreview] = useState(null);
     const fileInputRef = useRef(null);
     const cameraInputRef = useRef(null);
 
-    const {register, handleSubmit, formState: { errors }, reset, watch, setValue, } = useForm({
+    const {register, handleSubmit, formState: { errors }, reset, setValue, } = useForm({
         resolver: zodResolver(circularSchema),
     });
 
@@ -107,7 +125,7 @@ const CircularsPage = ({ isAdmin }) => {
         setUploadSuccess('');
 
         try {
-            const response = await axiosClient.post('/circular/upload', formData, {
+            await axiosClient.post('/circular/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -117,57 +135,63 @@ const CircularsPage = ({ isAdmin }) => {
             setPreview(null); // Clear the preview
             fetchCirculars(); // Refresh the table
             setTimeout(() => setUploadSuccess(''), 4000);
-
-             // On success:
-            // localStorage.removeItem(FORM_STORAGE_KEY);
-            // reset(getInitialValues()); // Reset to a clean state
         } catch (err) {
-            const message = err.response?.data?.msg || 'Failed to upload circular.';
+            const message = err.response?.data?.message || err.response?.data?.msg || 'Failed to upload circular.';
             setUploadError(message);
         } finally {
             setIsUploading(false);
         }
     };
     
-    const openModal = (url) => {
-        setSelectedCircularUrl(url);
+    const openModal = (circular) => {
+        if (isPdfCircular(circular)) {
+            window.open(getCircularFileUrl(circular), '_blank', 'noopener,noreferrer');
+            return;
+        }
+
+        setSelectedCircular(circular);
         setModalOpen(true);
     };
 
     // delete circular function can be added here for admin if needed
     const deleteCircular = async (circularId) => {
-        // Implement delete functionality if required
-        if (!window.confirm('Are you sure you want to delete this circular?')) return;
         try {
             await axiosClient.delete(`/circular/delete/${circularId}`);
-            alert('Circular deleted successfully!');
+            setUploadSuccess('Circular deleted successfully.');
+            setConfirmDeleteId(null);
             fetchCirculars(); // Refresh the list
         } catch (err) {
-            alert('Failed to delete circular. Please try again.');
+            setUploadError('Failed to delete circular. Please try again.');
             console.error(err);
         }   
     }
 
     // --- Admin Upload Section Component ---
     const AdminUploadSection = () => (
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Upload New Circular</h2>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 mb-8">
+            <h2 className="text-2xl font-bold mb-4 text-slate-900">Upload New Circular</h2>
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
                 {/* File Input and Preview Section */}
-                <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg text-center">
+                <div className="border-2 border-dashed border-slate-300 p-4 rounded-lg text-center bg-slate-50">
                     <input type="file" accept={ACCEPTED_FILE_TYPES.join(',')} {...register('circular')} onChange={handleFileChange} ref={fileInputRef} className="hidden" />
                     <input type="file" accept="image/*" capture="environment" onChange={handleFileChange} ref={cameraInputRef} className="hidden" />
 
                     {preview ? (
                         <div className="mb-4 relative">
-                            <img src={preview} alt="Preview" className="max-h-60 rounded-md mx-auto" />
+                            {dataUrlLooksLikePdf(preview) ? (
+                                <embed src={preview} type="application/pdf" className="h-60 w-full rounded-md" />
+                            ) : dataUrlLooksLikeVideo(preview) ? (
+                                <video src={preview} controls className="max-h-60 rounded-md mx-auto" />
+                            ) : (
+                                <img src={preview} alt="Preview" className="max-h-60 rounded-md mx-auto" />
+                            )}
                             <button type="button" onClick={() => { setPreview(null); reset({ circular: null }); }} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1">
                                <XCircle size={20} />
                             </button>
                         </div>
                     ) : (
                         <div className="flex flex-col sm:flex-row gap-4">
-                             <button type="button" onClick={() => fileInputRef.current.click()} className="flex-1 inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                             <button type="button" onClick={() => fileInputRef.current.click()} className="flex-1 inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-cyan-700 hover:bg-cyan-800">
                                 <Upload className="mr-2" size={20} />
                                 Upload from Storage
                             </button>
@@ -179,18 +203,18 @@ const CircularsPage = ({ isAdmin }) => {
                 {/* Text Inputs */}
                 <div className="mt-4">
                     <label htmlFor="title" className="block text-sm font-medium text-gray-700">Circular Title <span className="text-red-500">*</span></label>
-                    <input type="text" id="title" {...register('title')} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                    <input type="text" id="title" {...register('title')} className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500" />
                     {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
                 </div>
                 <div className="mt-4">
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description <span className="text-red-500">*</span></label>
-                    <textarea id="description" {...register('description')} rows="3" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                    <textarea id="description" {...register('description')} rows="3" className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500" />
                     {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
                 </div>
 
                 {/* Submit Button */}
                 <div className="mt-6 text-right">
-                    <button type="submit" disabled={isUploading} className=" cursor-pointer inline-flex items-center px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 disabled:bg-green-300">
+                    <button type="submit" disabled={isUploading} className=" cursor-pointer inline-flex items-center px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-cyan-700 hover:bg-cyan-800 disabled:bg-cyan-300">
                         {isUploading ? <Loader2 className="animate-spin mr-2" /> : <FileCheck className="mr-2" />}
                         {isUploading ? 'Uploading...' : 'Upload Circular'}
                     </button>
@@ -203,14 +227,14 @@ const CircularsPage = ({ isAdmin }) => {
     );
 
     return (
-        <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Circulars</h1>
+        <div className="p-4 sm:p-6 lg:p-8 bg-slate-50 min-h-screen">
+            {isAdmin ? <AdminHeader title="Circulars" subtitle="Upload and manage hostel notices" /> : <h1 className="text-3xl font-bold text-slate-900 mb-6">Circulars</h1>}
 
             {isAdmin && <AdminUploadSection />}
 
             {/* --- CIRCULARS TABLE --- */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold mb-4 text-gray-800">Notice Board</h2>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                <h2 className="text-2xl font-bold mb-4 text-slate-900">Notice Board</h2>
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-100">
@@ -235,9 +259,15 @@ const CircularsPage = ({ isAdmin }) => {
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {/* Note: I've changed circular.circularURL to circular.pdfUrl to match the backend schema from previous answers */}
                                             <div className="flex items-center gap-4">
-                                                <button onClick={() => openModal(circular.circularURL)} className="text-indigo-600 cursor-pointer hover:text-indigo-900 font-semibold">View</button>
+                                                {isPdfCircular(circular) ? (
+                                                    <a href={getCircularFileUrl(circular)} target="_blank" rel="noopener noreferrer" className="text-indigo-600 cursor-pointer hover:text-indigo-900 font-semibold">
+                                                        Open PDF
+                                                    </a>
+                                                ) : (
+                                                    <button onClick={() => openModal(circular)} className="text-indigo-600 cursor-pointer hover:text-indigo-900 font-semibold">View</button>
+                                                )}
                                                 {isAdmin && (
-                                                    <button onClick={() => deleteCircular(circular._id)} className=" p-1.5 rounded-2xl text-gray-100 cursor-pointer hover:text-red-800 font-semibold bg-red-500">Delete</button>
+                                                    <button onClick={() => setConfirmDeleteId(circular._id)} className="px-3 py-1.5 rounded-md text-white cursor-pointer font-semibold bg-red-600 hover:bg-red-700">Delete</button>
                                                 )}
                                             </div>
                                         </td>
@@ -252,18 +282,34 @@ const CircularsPage = ({ isAdmin }) => {
             </div>
 
             {/* --- VIEW MODAL --- */}
-            {modalOpen && (
+            {modalOpen && selectedCircular && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
                     <div className="bg-white p-4 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-auto">
-                        <div className="flex justify-end">
+                        <div className="flex items-center justify-between gap-3">
+                            <div>
+                                <h3 className="font-semibold text-slate-900">{selectedCircular.title}</h3>
+                                <p className="text-sm text-slate-500">{selectedCircular.mimeType || selectedCircular.resourceType || 'Circular file'}</p>
+                            </div>
                             <button onClick={() => setModalOpen(false)} className="text-2xl font-bold text-gray-600 hover:text-gray-900">&times;</button>
                         </div>
                         <div className="mt-2">
-                            {selectedCircularUrl.endsWith('.pdf') ? (
-                                <embed src={selectedCircularUrl} type="application/pdf" className="w-full h-[75vh]" />
+                            {selectedCircular.mimeType?.startsWith('video/') || selectedCircular.resourceType === 'video' ? (
+                                <video src={selectedCircular.circularURL} controls className="max-h-[75vh] w-full rounded-md bg-black" />
                             ) : (
-                                <img src={selectedCircularUrl} alt="Circular" className="max-w-full max-h-[75vh] mx-auto" />
+                                <img src={selectedCircular.circularURL} alt="Circular" className="max-w-full max-h-[75vh] mx-auto" />
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+            {confirmDeleteId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-md rounded-lg bg-white p-5 shadow-xl">
+                        <h3 className="text-lg font-semibold text-slate-900">Delete circular?</h3>
+                        <p className="mt-1 text-sm text-slate-600">This notice will be removed from the notice board.</p>
+                        <div className="mt-5 flex justify-end gap-3">
+                            <button onClick={() => setConfirmDeleteId(null)} className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
+                            <button onClick={() => deleteCircular(confirmDeleteId)} className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">Delete</button>
                         </div>
                     </div>
                 </div>

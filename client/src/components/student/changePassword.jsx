@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useSelector } from 'react-redux';
 import axiosClient from '../../config/axiosClient';
+import { KeyRound, X } from 'lucide-react';
 
 // Define Zod validation schema
 const passwordChangeSchema = z.object({
@@ -24,6 +25,7 @@ const passwordChangeSchema = z.object({
 const PasswordChangeForm = () => {
   const [showInputs, setShowInputs] = useState(false);
   const [isChanging, setIsChanging] = useState(false);
+  const [notice, setNotice] = useState(null);
 
   const { user } = useSelector((state) => state.auth);
 
@@ -53,33 +55,40 @@ const PasswordChangeForm = () => {
       const response = await axiosClient.put(`/user/change-password/${user._id}`,data);
 
       // On success
-      alert('Password changed successfully!');
+      setNotice({ type: 'success', message: response.data?.message || 'Password changed successfully.' });
       setShowInputs(false);
       reset();
     } catch (error) {
       console.error('Error changing password:', error);
-      alert('Failed to change password. Please try again.');
+      setNotice({ type: 'error', message: error?.response?.data?.error || 'Failed to change password. Please try again.' });
     } finally {
       setIsChanging(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto pt-5">
+    <div className="max-w-4xl mx-auto pt-5">
+      {notice && (
+        <div className={`mb-5 flex items-center justify-between rounded-lg border p-3 text-sm ${notice.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-800'}`}>
+          <span>{notice.message}</span>
+          <button type="button" onClick={() => setNotice(null)} aria-label="Dismiss message"><X className="h-4 w-4" /></button>
+        </div>
+      )}
       {!showInputs ? (
         <button
           onClick={handleChangePasswordClick}
-          className="cursor-pointer w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+          className="cursor-pointer inline-flex w-full items-center justify-center gap-2 rounded-md border border-cyan-200 bg-cyan-50 px-4 py-3 font-semibold text-cyan-800 hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-colors duration-200"
           type="button"
         >
+          <KeyRound className="h-4 w-4" />
           Change Password
         </button>
       ) : (
         <form 
           onSubmit={handleSubmit(onSubmit)} 
-          className="bg-white p-6 rounded-xl shadow-md border border-gray-200"
+          className="bg-white p-6 rounded-lg shadow-sm border border-slate-200"
         >
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">Change Password</h2>
+          <h2 className="text-xl font-semibold text-slate-900 mb-6">Change Password</h2>
           
           <div className="space-y-5">
             {/* Old Password Field */}
@@ -97,8 +106,8 @@ const PasswordChangeForm = () => {
                 className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
                   errors.oldPassword 
                     ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
-                    : 'border-gray-300 focus:border-blue-500'
-                } ${(isSubmitting || isChanging) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    : 'border-slate-300 focus:border-cyan-500 focus:ring-cyan-500/30'
+                } ${(isSubmitting || isChanging) ? 'bg-slate-100 cursor-not-allowed' : ''}`}
                 placeholder="Enter your current password"
                 disabled={isSubmitting || isChanging}
               />
@@ -127,8 +136,8 @@ const PasswordChangeForm = () => {
                 className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
                   errors.newPassword 
                     ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
-                    : 'border-gray-300 focus:border-blue-500'
-                } ${(isSubmitting || isChanging) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    : 'border-slate-300 focus:border-cyan-500 focus:ring-cyan-500/30'
+                } ${(isSubmitting || isChanging) ? 'bg-slate-100 cursor-not-allowed' : ''}`}
                 placeholder="Enter your new password"
                 disabled={isSubmitting || isChanging}
               />
@@ -160,8 +169,8 @@ const PasswordChangeForm = () => {
                 className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
                   errors.confirmPassword 
                     ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
-                    : 'border-gray-300 focus:border-blue-500'
-                } ${(isSubmitting || isChanging) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    : 'border-slate-300 focus:border-cyan-500 focus:ring-cyan-500/30'
+                } ${(isSubmitting || isChanging) ? 'bg-slate-100 cursor-not-allowed' : ''}`}
                 placeholder="Confirm your new password"
                 disabled={isSubmitting || isChanging}
               />
@@ -181,7 +190,7 @@ const PasswordChangeForm = () => {
             <button
               type="submit"
               disabled={isSubmitting || isChanging}
-              className="cursor-pointer flex-1 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-green-600 transition-colors duration-200 flex items-center justify-center gap-2"
+              className="cursor-pointer flex-1 bg-cyan-700 text-white py-3 px-4 rounded-md font-semibold hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-cyan-700 transition-colors duration-200 flex items-center justify-center gap-2"
             >
               {(isSubmitting || isChanging) ? (
                 <>
@@ -198,7 +207,7 @@ const PasswordChangeForm = () => {
               type="button"
               onClick={handleCancelClick}
               disabled={isSubmitting || isChanging}
-              className="cursor-pointer flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-gray-200 transition-colors duration-200"
+              className="cursor-pointer flex-1 bg-white border border-slate-300 text-slate-800 py-3 px-4 rounded-md font-semibold hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors duration-200"
             >
               Cancel
             </button>

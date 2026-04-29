@@ -87,7 +87,7 @@ const App = () => {
 
            {/* PROTECTED ADMIN ROUTES (Ternary Check)  */}
             <Route path="/admin/dashboard"  element={renderProtectedElement("admin", AdminDashboard, "/admin/login")} />
-            <Route path="admin/circulars"  element={renderProtectedElement("admin", () => <CircularsPage isAdmin={true} />, "/admin/login")} />
+            <Route path="/admin/circulars"  element={renderProtectedElement("admin", () => <CircularsPage isAdmin={true} />, "/admin/login")} />
             <Route path="/admin/attendance-dashboard"  element={renderProtectedElement("admin", AttendanceDashboard, "/admin/login")}   />
             <Route path='/admin/leave'  element={renderProtectedElement("admin", Leave, "/admin/login")}  />
             <Route path="/admin/grievance"  element={renderProtectedElement("admin", WardenGrievance, "/admin/login")} />

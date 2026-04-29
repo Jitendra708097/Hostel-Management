@@ -2,6 +2,7 @@ import {  FiBell, FiFileText, FiMessageSquare, FiCalendar, FiDollarSign, FiCheck
 import { motion,} from 'framer-motion';
 import { useSelector, } from 'react-redux';
 import { Link } from 'react-router';
+import LoadingSpinner from '../../utils/loadingSpinner';
 
 const StudentDashboard = () => {
     const  {isAuthenticated, user, loading }  = useSelector(state => state.auth);
@@ -27,15 +28,15 @@ const StudentDashboard = () => {
 
 
     return (
-        <div className="bg-gray-200 min-h-screen font-sans">
+        <div className="bg-slate-50 min-h-screen font-sans">
             {/* Header */}
             <motion.header
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="bg-white shadow-md fixed w-full top-0 left-0 z-50"
+                className="bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200 sticky w-full top-0 left-0 z-50"
             >
-                <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
                     <div className="flex items-center space-x-4">
                         <img src="https://tse2.mm.bing.net/th/id/OIP.tD4EJQ_esnNeKNa11WC7SAHaHa?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3" alt="HRIT UNIVERSITY logo" className="h-12 w-12" />
                         <div>
@@ -60,14 +61,19 @@ const StudentDashboard = () => {
             </motion.header>
 
             {/* Main Content */}
-            <main className="pt-44 pb-16">
+            <main className="py-8 sm:py-10">
                 <div className="container mx-auto px-6">
+                    <div className="mb-8">
+                        <p className="text-sm font-medium text-cyan-700">Student Portal</p>
+                        <h2 className="text-3xl font-bold text-slate-900">Welcome back, {user?.userName || 'Student'}</h2>
+                        <p className="mt-1 text-slate-600">Access hostel services, requests, notices, and payments from one place.</p>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {features.map((feature, index) => (
                         <Link to={feature.path} key={index} >
-                            <div className="bg-white rounded-lg p-6 cursor-pointer border hover:shadow-lg transition-shadow">
+                            <div className="h-full bg-white rounded-lg p-6 cursor-pointer border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
                                <div className="flex items-center justify-between">
-                                    <div className="p-3 bg-slate-100 text-gray-600 rounded-full">
+                                    <div className="p-3 bg-cyan-50 text-cyan-700 rounded-full">
                                         {feature.icon}
                                     </div>
                                 </div>
@@ -81,7 +87,7 @@ const StudentDashboard = () => {
             </main>
 
             {/* Footer */}
-            <footer className="bg-blue-900 py-4 left-0 w-full border-t mt-15">
+            <footer className="bg-slate-900 py-4 left-0 w-full border-t border-slate-800 mt-15">
                 <div className="container mx-auto px-6 text-center text-gray-100">
                     &copy; {new Date().getFullYear()} HRIT UNIVERSITY. All Rights Reserved.
                 </div>

@@ -127,12 +127,12 @@ const AdminLoginPage = () => {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="p-3 bg-primary-100 rounded-full"
+                className="p-3 bg-cyan-50 rounded-full"
               >
-                <School size={48} className="text-primary-600" />
+                <School size={48} className="text-cyan-700" />
               </motion.div>
             </Link>
-            <h2 className="mt-6 text-3xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-primary-600 to-purple-600">
+            <h2 className="mt-6 text-3xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-blue-700 to-cyan-700">
               Welcome to RSD Hostel
             </h2>
           </motion.div>
@@ -175,7 +175,7 @@ const AdminLoginPage = () => {
                       {...loginForm.register('email')}
                       className={`block w-full pl-10 pr-4 py-3 border rounded-lg outline-none transition-all duration-300
                         ${loginForm.formState.errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white/50'}
-                        focus:ring-2 focus:ring-primary-500/30
+                        focus:ring-2 focus:ring-cyan-500/30
                         text-gray-900`}
                       placeholder="Enter your email"
                     />
@@ -200,7 +200,7 @@ const AdminLoginPage = () => {
                       {...loginForm.register('password')}
                       className={`block w-full pl-10 pr-12 py-3 border rounded-lg outline-none transition-all duration-300
                         ${loginForm.formState.errors.password ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white/50'}
-                        focus:ring-2 focus:ring-primary-500/30
+                        focus:ring-2 focus:ring-cyan-500/30
                         text-gray-900`}
                       placeholder="Enter your password"
                     />
@@ -232,7 +232,7 @@ const AdminLoginPage = () => {
                   <button
                     type="button"
                     onClick={() => setViewState('forgotPassword')}
-                    className="cursor-pointer text-primary-600 hover:text-primary-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 rounded-md p-1"
+                    className="cursor-pointer text-cyan-700 hover:text-cyan-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 rounded-md p-1"
                   >
                     Forgot Password?
                   </button>
@@ -243,7 +243,7 @@ const AdminLoginPage = () => {
                     type="submit"
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    className={`cursor-pointer w-full flex justify-center items-center py-3 px-4 rounded-lg bg-blue-100 text-blue-400 font-medium transition-all duration-300 shadow-lg hover:shadow-primary-500/25 ${
+                    className={`cursor-pointer w-full flex justify-center items-center py-3 px-4 rounded-lg bg-blue-600 text-white font-semibold transition-all duration-300 shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-700/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                       loading ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
                     disabled={loading}
@@ -251,7 +251,7 @@ const AdminLoginPage = () => {
                     <span className="flex items-center gap-2">
                       {loading ? (
                         <>
-                          <svg className="animate-spin h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
@@ -269,7 +269,7 @@ const AdminLoginPage = () => {
                     <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-xs text-red-500 mt-3 text-center"
+                      className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 mt-3 text-center"
                     >
                       {error?.error}
                     </motion.p>
@@ -281,7 +281,7 @@ const AdminLoginPage = () => {
                   <span className="text-gray-600">Don't have an account? </span>
                   <Link
                     to="/register"  
-                    className="text-blue-800 hover:text-primary-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 rounded-md p-1"
+                    className="text-blue-800 hover:text-cyan-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 rounded-md p-1"
                   >
                     Register Here
                   </Link>
@@ -312,7 +312,7 @@ const AdminLoginPage = () => {
                         {...forgotPasswordForm.register('email')}
                         className={`block w-full pl-10 pr-4 py-3 border rounded-lg outline-none transition-all duration-300
                           ${forgotPasswordForm.formState.errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white/50'}
-                          focus:ring-2 focus:ring-primary-500/30
+                          focus:ring-2 focus:ring-cyan-500/30
                           text-gray-900`}
                         placeholder="Enter your email"
                       />
@@ -359,7 +359,7 @@ const AdminLoginPage = () => {
                     <button
                       type="button"
                       onClick={() => setViewState('login')}
-                      className="text-primary-600 hover:text-primary-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 rounded-md p-1"
+                      className="text-cyan-700 hover:text-cyan-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 rounded-md p-1"
                     >
                       Back to Login
                     </button>
@@ -388,7 +388,7 @@ const AdminLoginPage = () => {
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                   onClick={() => setViewState('login')}
-                  className="mt-6 w-full flex justify-center items-center py-3 px-4 rounded-lg text-blue-400 font-medium transition-all duration-300 shadow-lg hover:shadow-primary-500/25"
+                  className="mt-6 w-full flex justify-center items-center py-3 px-4 rounded-lg bg-blue-600 text-white font-semibold transition-all duration-300 shadow-lg shadow-blue-600/20 hover:bg-blue-700"
                 >
                   <LogIn className="h-5 w-5 mr-2" /> Back to Login
                 </motion.button>
@@ -404,13 +404,13 @@ const AdminLoginPage = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.5 }}
           transition={{ duration: 1 }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/30 rounded-full mix-blend-multiply filter blur-3xl"
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl"
         />
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.5 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-multiply filter blur-3xl"
+          className="absolute top-1/3 right-1/4 w-96 h-96 bg-cyan-500/20 rounded-full mix-blend-multiply filter blur-3xl"
         />
       </div>
     </motion.div>
