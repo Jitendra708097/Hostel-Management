@@ -6,26 +6,26 @@ const adminMiddleware = async (req, res, next) => {
     try {
         const { token } = req.cookies;
         if (!token) {
-            res.status(401).json('Authentication token is missing');
+            return res.status(401).json({ message: 'Authentication token is missing' });
         }
         const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
         if (!payload) {
-            res.status(401).json('Invalid authentication token');
+            return res.status(401).json({ message: 'Invalid authentication token' });
         }
         const { _id } = payload;
         if (!_id) {
-            res.status(401).json('Invalid token payload');
+            return res.status(401).json({ message: 'Invalid token payload' });
         }
         if(payload.role !== 'admin'){
-            res.status(401).json('Access denied. Admins only.');
+            return res.status(403).json({ message: 'Access denied. Admins only.' });
         }
         const user = await User.findById(_id).select('-password');
         if (!user) {
-            res.status(401).json('User not found');
+            return res.status(401).json({ message: 'User not found' });
         }
-        const isBlacklisted = await redisClient.exists(`token:$${token}`);
+        const isBlacklisted = await redisClient.exists(`token:${token}`);
         if (isBlacklisted) {
-            res.status(401).json('Token has been blacklisted');
+            return res.status(401).json({ message: 'Token has been blacklisted' });
         }
         req.user = user;
         next();

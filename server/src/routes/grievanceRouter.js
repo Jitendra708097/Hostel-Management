@@ -7,7 +7,7 @@ const adminMiddleware = require('../middleware/adminMiddleware');
 
 
 // for student
-grievanceRouter.post('/submit/:_id',userMiddleware,upload.single('file'),grievanceSubmitted);
+grievanceRouter.post('/submit/:_id',userMiddleware,upload.grievance.array('file', 5),grievanceSubmitted);
 grievanceRouter.get('/getById/:_id',userMiddleware,getGrievanceById);
 grievanceRouter.get('/get/:_id',userMiddleware,getMyGrievances);
 
@@ -15,6 +15,6 @@ grievanceRouter.get('/get/:_id',userMiddleware,getMyGrievances);
 grievanceRouter.get('/fetch',adminMiddleware,getAllGrievances);
 grievanceRouter.get('/details/:_id',adminMiddleware,getGrievanceDetails);
 grievanceRouter.put('/:_id/status',adminMiddleware,updateGrievanceStatus);
-grievanceRouter.post('/:_id/comment',addComment);
+grievanceRouter.post('/:_id/comment',adminMiddleware,addComment);
 
 module.exports = grievanceRouter;

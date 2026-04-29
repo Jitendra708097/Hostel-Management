@@ -2,6 +2,28 @@
 const cloudinary = require('../config/cloudinary'); // Cloudinary configuration
 const Circular = require('../models/circularSchema'); // Mongoose model for storing media info
 const bufferToStream = require('../utils/bufferToStream');
+const { Readable } = require('stream');
+
+const getCloudinaryResourceType = (mimeType = '') => {
+    if (mimeType === 'application/pdf') return 'raw';
+    if (mimeType.startsWith('video/')) return 'video';
+    return 'image';
+};
+
+const buildPublicId = (file) => {
+    const originalName = file.originalname || 'circular';
+    const safeName = originalName
+        .replace(/\.[^/.]+$/, '')
+        .replace(/[^a-zA-Z0-9-_]/g, '-')
+        .replace(/-+/g, '-')
+        .slice(0, 60) || 'circular';
+
+    if (file.mimetype === 'application/pdf') {
+        return `${Date.now()}-${safeName}.pdf`;
+    }
+
+    return `${Date.now()}-${safeName}`;
+};
 
 // Upload media file to Cloudinary and store info in MongoDB 
 // Accepts file in req.file (from Multer) and metadata in req.body.
@@ -23,7 +45,8 @@ const uploadCircular =  async (req, res) => {
         const fileStream = bufferToStream(fileBuffer);
         const uploadOptions = {
             folder: 'Hostel_Management/Circulars', // Optional: Folder in Cloudinary
-            resource_type: req.file.mimetype.startsWith('video/') ? 'video' : 'auto', // Auto-detect or specify
+            resource_type: getCloudinaryResourceType(req.file.mimetype),
+            public_id: buildPublicId(req.file),
         };
         const result = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
@@ -34,10 +57,17 @@ const uploadCircular =  async (req, res) => {
         });
 
         // Store in MongoDB
-        const newMedia = new Circular({ public_id: result.public_id, circularURL: result.secure_url, title, description});
+        const newMedia = new Circular({
+            public_id: result.public_id,
+            circularURL: result.secure_url,
+            title,
+            description,
+            mimeType: req.file.mimetype,
+            resourceType: result.resource_type || getCloudinaryResourceType(req.file.mimetype),
+        });
         await newMedia.save();
 
-        res.status(200).json({ message: 'File uploaded successfully!', circularURL: result.secure_url, public_id: result.public_id, }); 
+        res.status(200).json({ message: 'File uploaded successfully!', data: newMedia }); 
     }
     catch (error) {
         console.error('Cloudinary upload error:', error);
@@ -84,7 +114,7 @@ const deleteCircularById = async (req, res) => {
     try 
     {
         // Delete from Cloudinary
-        const cloudinaryResult = await cloudinary.uploader.destroy(public_id, {  resource_type: mediaItem.resource_type === 'video' ? 'video' : 'image' });
+        const cloudinaryResult = await cloudinary.uploader.destroy(public_id, {  resource_type: mediaItem.resourceType || 'image' });
         if (cloudinaryResult.result !== 'ok' && cloudinaryResult.result !== 'not found') {
             return res.status(500).json({ message: 'Error deleting file from Cloudinary.', error: cloudinaryResult });
         }
@@ -115,6 +145,33 @@ const getCircularById = async (req, res) => {
     }   
 };
 
+const viewCircularById = async (req, res) => {
+    try {
+        const mediaItem = await Circular.findById(req.params._id);
+        if (!mediaItem) {
+            return res.status(404).send('Circular not found.');
+        }
+
+        const upstream = await fetch(mediaItem.circularURL);
+        if (!upstream.ok || !upstream.body) {
+            return res.status(502).send('Unable to open this circular file.');
+        }
+
+        const contentType = mediaItem.mimeType || upstream.headers.get('content-type') || 'application/octet-stream';
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', `inline; filename="${(mediaItem.title || 'circular').replace(/"/g, '')}.pdf"`);
+
+        if (upstream.headers.get('content-length')) {
+            res.setHeader('Content-Length', upstream.headers.get('content-length'));
+        }
+
+        Readable.fromWeb(upstream.body).pipe(res);
+    } catch (error) {
+        console.error('Error streaming circular:', error);
+        res.status(500).send('Unable to open this circular file.');
+    }
+};
+
 // Update media item metadata by ID
 const updateCircularById = async (req, res) => {
     try {
@@ -128,7 +185,8 @@ const updateCircularById = async (req, res) => {
             const fileStream = bufferToStream(fileBuffer);
             const uploadOptions = {
                 folder: 'Hostel_Management/circulars',
-                resource_type: req.file.mimetype.startsWith('video/') ? 'video' : 'auto',
+                resource_type: getCloudinaryResourceType(req.file.mimetype),
+                public_id: buildPublicId(req.file),
             };
 
             // Upload new file
@@ -143,7 +201,7 @@ const updateCircularById = async (req, res) => {
             // Attempt to delete old file from Cloudinary (best-effort)
             try {
                 if (mediaItem.public_id) {
-                    await cloudinary.uploader.destroy(mediaItem.public_id, { resource_type: mediaItem.resource_type === 'video' ? 'video' : 'image' });
+                    await cloudinary.uploader.destroy(mediaItem.public_id, { resource_type: mediaItem.resourceType || 'image' });
                 }
             } catch (delErr) {
                 console.warn('Failed to delete previous cloudinary asset:', delErr);
@@ -152,6 +210,8 @@ const updateCircularById = async (req, res) => {
             // Update DB fields with new Cloudinary result
             mediaItem.public_id = result.public_id;
             mediaItem.circularURL = result.secure_url;
+            mediaItem.mimeType = req.file.mimetype;
+            mediaItem.resourceType = result.resource_type || getCloudinaryResourceType(req.file.mimetype);
         }
 
         // Allow updating other metadata (e.g., caption) via body
@@ -167,6 +227,6 @@ const updateCircularById = async (req, res) => {
     }
 };
 
-module.exports = { uploadCircular, getAllCirculars, deleteCircularById, getCircularById, updateCircularById };
+module.exports = { uploadCircular, getAllCirculars, deleteCircularById, getCircularById, viewCircularById, updateCircularById };
 
 

@@ -79,7 +79,14 @@ const getProfile = async (req, res) => {
         return res.status(400).json({ error: 'User ID is required' });
     }
 
+    if (req.user.role !== 'admin' && req.user._id.toString() !== _id) {
+        return res.status(403).json({ error: 'You are not authorized to view this profile' });
+    }
+
     const user = await User.findById(_id).select('-password');
+    if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+    }
     res.status(200).json({ message: 'User profile retrieved successfully!', user });
 }
 
@@ -151,12 +158,18 @@ const logout = async (req, res) => {
     try {
 
        const { token } = req.cookies;
+       if (!token) {
+           return res.status(400).json({ error: 'Authentication token is missing' });
+       }
        const payload = jwt.decode(token);
+       if (!payload?.exp) {
+           return res.status(400).json({ error: 'Invalid authentication token' });
+       }
 
        await redisClient.set(`token:${token}`, 'blacklisted');
        await redisClient.expireAt(`token:${token}`, payload.exp);
 
-       res.cookie('token', null, { expireAt: new Date(Date.now()) });
+       res.clearCookie('token');
 
     } catch (error) {
         return res.status(500).json({ error: 'Internal Server Error', details: error.message });
@@ -172,8 +185,47 @@ const updateDetails = async (req, res) => {
         if (!_id) {
             return res.status(400).json({ error: 'User ID is required' });
         }
-        const updatedData = req.body;
+        if (req.user.role !== 'admin' && req.user._id.toString() !== _id) {
+            return res.status(403).json({ error: 'You are not authorized to update this profile' });
+        }
+
+        const allowedFields = req.user.role === 'admin'
+            ? ['userName', 'phoneNo', 'roomNo', 'course', 'year', 'institution', 'feeStructure', 'totalDues']
+            : ['userName', 'phoneNo', 'roomNo', 'course', 'year', 'institution'];
+        const updatedData = {};
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined && req.body[field] !== '') {
+                updatedData[field] = req.body[field];
+            }
+        });
+
+        if (req.file) {
+            const existingUser = await User.findById(_id);
+            if (existingUser?.public_id) {
+                await cloudinary.uploader.destroy(existingUser.public_id);
+            }
+
+            const fileBuffer = req.file.buffer;
+            const fileStream = bufferToStream(fileBuffer);
+            const uploadOptions = {
+                folder: 'Hostel_Management/profileImages',
+                resource_type: req.file.mimetype.startsWith('video/') ? 'video' : 'auto',
+            };
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result);
+                });
+                fileStream.pipe(uploadStream);
+            });
+            updatedData.profileURL = result.secure_url;
+            updatedData.public_id = result.public_id;
+        }
+
         const updatedUser = await User.findByIdAndUpdate(_id, updatedData, { new: true }).select('-password');
+        if (!updatedUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
         res.status(200).json({ message: 'User details updated successfully!', user: updatedUser });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error', details: error.message });
@@ -302,7 +354,7 @@ const adminLogin = async (req, res) => {
 const getAllStudents = async (req, res) => {
     try {
         // Populate the feeStructure and paymentHistory fields
-        const students = await User.find({})
+        const students = await User.find({ role: 'student' })
             .populate('feeStructure', 'structureName totalAmount')
             .populate({ path: 'paymentHistory', select: 'amount status createdAt' });
 
@@ -335,21 +387,28 @@ const userPasswordChange = async (req,res) => {
     const _id = req.params._id;
     if(!_id)
     {
-        res.status(400).json({ error: "User Id is required." });
+        return res.status(400).json({ error: "User Id is required." });
+    }
+
+    if (req.user.role !== 'admin' && req.user._id.toString() !== _id) {
+        return res.status(403).json({ error: 'You are not authorized to change this password' });
     }
 
     const { newPassword, oldPassword } = req.body;
     if(!newPassword)
     {
-        res.status(400).json({ error: "Please Enter New Password." });
+        return res.status(400).json({ error: "Please Enter New Password." });
     }
 
     else if(!oldPassword)
     {
-        res.status(400).json({ error: "Please Enter New Password." });
+        return res.status(400).json({ error: "Please Enter Old Password." });
     }
 
     const user = await User.findById(_id);
+    if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+    }
     const isPasswordValid = await bcrypt.compare( oldPassword, user.password);
     if(!isPasswordValid)
     {

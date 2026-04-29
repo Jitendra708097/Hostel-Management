@@ -72,7 +72,7 @@ const attendenceFinalSubmit =  async (req, res) => {
 // Get student's attendance history (last 30 days)
 const getStudentAttendenceRecords =  async (req, res) => {
   try {
-    const studentId = req.params._id;
+    const studentId = req.user.role === 'admin' ? req.params._id : req.user._id;
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     thirtyDaysAgo.setHours(0, 0, 0, 0);

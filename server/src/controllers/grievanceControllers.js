@@ -7,20 +7,25 @@ const cloudinary = require('../config/cloudinary');
 const grievanceSubmitted = async (req, res) => {
     try {
         const { category, description, isAnonymous } = req.body;
-        const studentId = req.params._id; // from isAuthenticated middleware
+        const studentId = req.user._id;
 
         if (!category || !description) {
             return res.status(400).json({ success: false, message: 'Category and description are required.' });
         }
 
+        let attachments = [];
+
+        const files = req.files?.length ? req.files : (req.file ? [req.file] : []);
+
         // Upload to Cloudinary
-        if(req.file) {
-            const fileBuffer = req.file.buffer;
+        if(files.length) {
+            attachments = await Promise.all(files.map(async (file) => {
+            const fileBuffer = file.buffer;
             const fileStream = bufferToStream(fileBuffer);
 
             const uploadOptions = {
             folder: 'Hostel_Management/grievance', // Optional: Folder in Cloudinary
-            resource_type: req.file.mimetype.startsWith('video/') ? 'video' : 'auto', // Auto-detect or specify
+            resource_type: file.mimetype.startsWith('video/') ? 'video' : 'auto', // Auto-detect or specify
             // Add any other Cloudinary upload options here
             // e.g., quality: 'auto:low', eager: [{ width: 400, height: 300, crop: 'pad' }]
             };
@@ -33,11 +38,9 @@ const grievanceSubmitted = async (req, res) => {
                     fileStream.pipe(uploadStream);
                 });
 
-                attachments = { public_id: result.public_id, url: result.secure_url }
+                return { public_id: result.public_id, url: result.secure_url };
+            }));
         }
-        else {
-                attachments = [];
-            }
         
 
         // const attachments = req.files ? req.files.map(file => ({ public_id: file.filename, url: file.path })) : [];
@@ -61,7 +64,8 @@ const grievanceSubmitted = async (req, res) => {
 // grievance which they have submitted in past i.e. grievance history 
 const getMyGrievances = async (req, res) => {
     try {
-        const grievances = await Grievance.find({ studentId: req.params._id }).sort({ createdAt: -1 });
+        const studentId = req.user.role === 'admin' ? req.params._id : req.user._id;
+        const grievances = await Grievance.find({ studentId }).sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: grievances });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server Error', error: error.message });
@@ -79,7 +83,7 @@ const getGrievanceById = async (req, res) => {
         }
         
         // Ensure student can only view their own grievance
-        if (grievance.studentId.toString() !== req.params._id) {
+        if (req.user.role !== 'admin' && grievance.studentId.toString() !== req.user._id.toString()) {
              return res.status(403).json({ success: false, message: 'You are not authorized to view this grievance.' });
         }
 
@@ -155,9 +159,9 @@ const addComment = async (req, res) => {
         }
 
         const newComment = {
-            author: req.params._id,  //req.user._id,
-            authorName: "Jitendra Surendra",  // req.user.userName,
-            role: "student",       //req.user.role,
+            author: req.user?._id,
+            authorName: req.user?.userName || 'Admin',
+            role: req.user?.role || 'admin',
             text: text,
         };
 

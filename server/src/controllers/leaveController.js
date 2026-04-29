@@ -5,7 +5,7 @@ const leaveRequestByStudent =async (req, res) => {
     const { startDate, endDate, reason } = req.body;
     try {
         const leaveApplication = await LeaveApplication.create({
-            student: req.params._id,
+            student: req.user._id,
             startDate,
             endDate,
             reason,
@@ -19,7 +19,8 @@ const leaveRequestByStudent =async (req, res) => {
 // Check leave Status by student that approved or not. 
 const viewLeaveStatus = async (req, res) => {
     try {
-        const leaveApplications = await LeaveApplication.find({ student: req.params._id }).sort({ createdAt: -1 });
+        const studentId = req.user.role === 'admin' ? req.params._id : req.user._id;
+        const leaveApplications = await LeaveApplication.find({ student: studentId }).sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: leaveApplications });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });

@@ -25,7 +25,7 @@ const userMiddleware = async (req, res, next) => {
             throw new Error('User not found');
         }
 
-        const isBlacklisted = await redisClient.exists(`token:$${token}`);
+        const isBlacklisted = await redisClient.exists(`token:${token}`);
         if (isBlacklisted) {
             throw new Error('Token has been blacklisted');
         }

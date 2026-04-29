@@ -15,15 +15,41 @@ const createFeeStructure = async (req, res) => {
             return res.status(400).json({ message: 'Structure name and components are required.' });
         }
 
+        const normalizedComponents = {
+            admissionFee: Number(components.admissionFee || 0),
+            securityDeposit: Number(components.securityDeposit || 0),
+            hostelFee: Number(components.hostelFee || 0),
+        };
+
+        if (
+            !Number.isFinite(normalizedComponents.admissionFee) ||
+            !Number.isFinite(normalizedComponents.securityDeposit) ||
+            !Number.isFinite(normalizedComponents.hostelFee)
+        ) {
+            return res.status(400).json({ message: 'Fee components must be valid numbers.' });
+        }
+
+        if (normalizedComponents.admissionFee < 0 || normalizedComponents.securityDeposit < 0 || normalizedComponents.hostelFee <= 0) {
+            return res.status(400).json({ message: 'Fees cannot be negative, and hostel fee must be greater than zero.' });
+        }
+
         const newStructure = new FeeStructure({
-            structureName,
+            structureName: structureName.trim(),
             description,
-            components,
+            components: normalizedComponents,
         });
         
         await newStructure.save();
         res.status(201).json({ message: 'Fee structure created successfully', data: newStructure });
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ message: 'A fee structure with this name already exists.' });
+        }
+
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation error', error: error.message });
+        }
+
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -56,9 +82,37 @@ const updateFeeStructure = async (req, res) => {
     }
     
     try {
+        const updateData = { ...req.body };
+        if (updateData.structureName) {
+            updateData.structureName = updateData.structureName.trim();
+        }
+
+        if (updateData.components) {
+            const normalizedComponents = {
+                admissionFee: Number(updateData.components.admissionFee || 0),
+                securityDeposit: Number(updateData.components.securityDeposit || 0),
+                hostelFee: Number(updateData.components.hostelFee || 0),
+            };
+
+            if (
+                !Number.isFinite(normalizedComponents.admissionFee) ||
+                !Number.isFinite(normalizedComponents.securityDeposit) ||
+                !Number.isFinite(normalizedComponents.hostelFee)
+            ) {
+                return res.status(400).json({ message: 'Fee components must be valid numbers.' });
+            }
+
+            if (normalizedComponents.admissionFee < 0 || normalizedComponents.securityDeposit < 0 || normalizedComponents.hostelFee <= 0) {
+                return res.status(400).json({ message: 'Fees cannot be negative, and hostel fee must be greater than zero.' });
+            }
+
+            updateData.components = normalizedComponents;
+            updateData.totalAmount = normalizedComponents.admissionFee + normalizedComponents.securityDeposit + normalizedComponents.hostelFee;
+        }
+
         const updatedFeeStructure = await FeeStructure.findByIdAndUpdate(
             _id,
-            req.body, // Directly pass the request body
+            updateData,
             {
                 new: true,  // it will returns updated data
                 runValidators: true  //Ensures updates validate against schema
@@ -122,8 +176,11 @@ const assignFeeToStudent = async (req, res) => {
             return res.status(404).json({ message: 'Student or Fee Structure not found.' });
         }
 
+        const payments = await Payment.find({ student: student._id, status: 'success' }).select('amount');
+        const totalPaid = payments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+
         student.feeStructure = feeStructureId;
-        student.totalDues = feeStructure.totalAmount; // Set initial dues
+        student.totalDues = Math.max(0, Number(feeStructure.totalAmount || 0) - totalPaid);
         await student.save();
 
         res.status(200).json({ message: 'Fee structure assigned successfully.', data: student });
@@ -139,13 +196,23 @@ const createRazorpayOrder = async (req, res) => {
    
     try {
         const { amount, currency = 'INR' } = req.body;
+        const student = await User.findById(req.user._id).select('totalDues');
 
-        if (!amount) {
-            return res.status(400).json({ message: 'Amount is required.' });
+        const paymentAmount = Number(amount);
+        if (!Number.isFinite(paymentAmount) || paymentAmount <= 0) {
+            return res.status(400).json({ message: 'Enter a valid payment amount.' });
+        }
+
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found.' });
+        }
+
+        if (paymentAmount > Number(student.totalDues || 0)) {
+            return res.status(400).json({ message: 'Payment amount cannot be greater than current dues.' });
         }
 
         const options = {
-            amount: amount * 100, // Amount in the smallest currency unit (paise for INR)
+            amount: paymentAmount * 100, // Amount in the smallest currency unit (paise for INR)
             currency,
             receipt: `receipt_order_${new Date().getTime()}`,
         };
@@ -154,6 +221,15 @@ const createRazorpayOrder = async (req, res) => {
         if (!order) {
             return res.status(500).json({ message: 'Error creating Razorpay order.' });
         }
+
+        await Payment.create({
+            student: req.user._id,
+            amount: paymentAmount,
+            razorpay: {
+                orderId: order.id,
+            },
+            status: 'pending',
+        });
 
         res.status(201).json({ order });
     } catch (error) {
@@ -166,9 +242,9 @@ const createRazorpayOrder = async (req, res) => {
 // Razorpay sends back payment details. We must verify the signature to confirm authenticity.
 const verifyPayment = async (req, res) => {
     
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, studentId, amountPaid } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !studentId || !amountPaid) {
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
         return res.status(400).json({ message: "All payment verification fields are required."});
     }
 
@@ -185,32 +261,37 @@ const verifyPayment = async (req, res) => {
         // 3. Compare the signatures
         if (expectedSignature === razorpay_signature) {
             // PAYMENT IS AUTHENTIC - Now, update the database
-            
+
+            const pendingPayment = await Payment.findOne({
+                student: req.user._id,
+                'razorpay.orderId': razorpay_order_id,
+                status: 'pending',
+            });
+
+            if (!pendingPayment) {
+                return res.status(404).json({ message: 'Pending payment order not found.' });
+            }
+
             // a. Find the student
-            const student = await User.findById({ _id: studentId });
+            const student = await User.findById({ _id: req.user._id });
             if (!student) {
                 return res.status(404).json({ message: 'Student not found.' });
             }
 
-            // b. Create a new payment record
-            const payment = new Payment({
-                student: studentId,
-                amount: amountPaid,
-                razorpay: {
-                    orderId: razorpay_order_id,
-                    paymentId: razorpay_payment_id,
-                    signature: razorpay_signature,
-                },
-                status: 'success',
-            });
-            await payment.save();
+            // b. Complete the existing pending payment record
+            pendingPayment.razorpay.paymentId = razorpay_payment_id;
+            pendingPayment.razorpay.signature = razorpay_signature;
+            pendingPayment.status = 'success';
+            await pendingPayment.save();
             
             // c. Update student's records
-            student.paymentHistory.push(payment._id);
-            student.totalDues -= amountPaid; // Reduce the dues by the amount paid
+            if (!student.paymentHistory.some((id) => id.equals(pendingPayment._id))) {
+                student.paymentHistory.push(pendingPayment._id);
+            }
+            student.totalDues = Math.max(0, Number(student.totalDues || 0) - Number(pendingPayment.amount || 0));
             await student.save();
             
-            res.status(200).json({ status: 'success', message: 'Payment verified and recorded successfully.', paymentId: payment._id });
+            res.status(200).json({ status: 'success', message: 'Payment verified and recorded successfully.', paymentId: pendingPayment._id });
 
         } else {
             // PAYMENT IS FRAUDULENT
@@ -226,7 +307,7 @@ const verifyPayment = async (req, res) => {
 const getAllPayments = async (req, res) => {
     
     try {
-        const payments = await Payment.find({}).populate('student', 'userName emailId');
+        const payments = await Payment.find({}).populate('student', 'userName emailId').sort({ createdAt: -1 });
         res.status(200).json({ data: payments });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -239,7 +320,14 @@ const getStudentFeeDetails = async (req, res) => {
     
     try {
         const { studentId } = req.params;
-        const student = await User.findById({ _id: studentId }).populate('feeStructure').populate('paymentHistory');
+        if (req.user.role !== 'admin' && req.user._id.toString() !== studentId) {
+            return res.status(403).json({ message: 'You are not authorized to view this fee record.' });
+        }
+
+        const student = await User.findById({ _id: studentId })
+            .select('userName emailId roomNo year course institution profileURL feeStructure totalDues paymentHistory')
+            .populate('feeStructure')
+            .populate({ path: 'paymentHistory', select: 'amount status createdAt razorpay.orderId razorpay.paymentId' });
 
         if (!student) {
             return res.status(404).json({ message: 'Student not found.' });

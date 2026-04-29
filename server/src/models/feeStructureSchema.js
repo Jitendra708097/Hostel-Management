@@ -32,7 +32,14 @@ const feeStructureSchema = new mongoose.Schema({
 
 // Calculate totalAmount before saving
 feeStructureSchema.pre('save', function(next) {
-    this.totalAmount = this.components.admissionFee + this.components.securityDeposit + this.components.hostelFee;
+    const admissionFee = Number(this.components?.admissionFee || 0);
+    const securityDeposit = Number(this.components?.securityDeposit || 0);
+    const hostelFee = Number(this.components?.hostelFee || 0);
+
+    this.components.admissionFee = admissionFee;
+    this.components.securityDeposit = securityDeposit;
+    this.components.hostelFee = hostelFee;
+    this.totalAmount = admissionFee + securityDeposit + hostelFee;
     next();
 });
 

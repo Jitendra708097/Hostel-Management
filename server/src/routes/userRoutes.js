@@ -11,7 +11,7 @@ const adminMiddleware = require('../middleware/adminMiddleware');
 userRouter.post('/register',upload.single('profilePhoto'), register); // done
 userRouter.post('/login', login); 
 userRouter.post('/logout',userMiddleware, logout); 
-userRouter.put('/update/:_id', userMiddleware, updateDetails);
+userRouter.put('/update/:_id', userMiddleware, upload.single('profilePhoto'), updateDetails);
 userRouter.put('/change-password/:_id',userMiddleware,userPasswordChange);
 userRouter.post('/forgot-password', forgotPassword); 
 userRouter.post('/reset-password/:token/:userId', resetPassword);
@@ -35,8 +35,9 @@ userRouter.get('/check', userMiddleware, (req, res) => {
 userRouter.post('/admin/login', adminLogin); // Admin login
 userRouter.delete('/delete/:_id', adminMiddleware, deleteUserById); 
 userRouter.get('/getAllStudents', adminMiddleware, getAllStudents);
-userRouter.get('/:_id', getProfile); // Get user by ID
-userRouter.get('/',userMiddleware, getAllUsers); // Get all users
+userRouter.put('/admin/update/:_id', adminMiddleware, upload.single('profilePhoto'), updateDetails);
+userRouter.get('/:_id', userMiddleware, getProfile); // Get user by ID
+userRouter.get('/',adminMiddleware, getAllUsers); // Get all users
 
 
 module.exports = userRouter;

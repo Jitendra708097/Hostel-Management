@@ -60,7 +60,7 @@ const updateMenu = async (req, res) => {
         if (!menu) {
             // If no menu for this day, create a new one
             menu = new Menu({
-                day,
+                days: day,
                 mealAndItem: [{ meal, itemName }]
             });
             await menu.save();
@@ -71,11 +71,12 @@ const updateMenu = async (req, res) => {
         const mealIndex = menu.mealAndItem.findIndex(m => m.meal.toLowerCase() === meal.toLowerCase());
         if (mealIndex !== -1) {
             // Update the itemName for this meal
-           const res =  menu.mealAndItem[mealIndex].itemName = itemName;
+            menu.mealAndItem[mealIndex].itemName = itemName;
         } else {
-            const res = menu.mealAndItem.push({ meal, itemName });
+            menu.mealAndItem.push({ meal, itemName });
         }
-        
+
+        await menu.save();
 
         res.status(200).json({ message: 'Menu updated successfully', menu });
     } catch (error) {

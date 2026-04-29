@@ -14,7 +14,7 @@ feeRouter.delete('/structure/:_id/delete',adminMiddleware,deleteFeeStructure); /
 feeRouter.put('/:_id/update',adminMiddleware,updateFeeStructure); // this will update the fee structure details.
 
 // for both admin and student 
-feeRouter.get('/student/:studentId',getStudentFeeDetails); // Get fee details for a specific student for both student and admin
+feeRouter.get('/student/:studentId',userMiddleware,getStudentFeeDetails); // Get fee details for a specific student for both student and admin
 
 // --- Student-Facing Routes ---
 feeRouter.post('/create-order',userMiddleware,createRazorpayOrder); // Create a Razorpay order for payment

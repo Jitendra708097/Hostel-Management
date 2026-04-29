@@ -22,10 +22,18 @@ const circularSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    uploadDate: {
+    mimeType: {
+        type: String
+    },
+    resourceType: {
         type: String,
+        enum: ['image', 'video', 'raw'],
+        default: 'image'
+    },
+    uploadDate: {
+        type: Date,
         required: true,
-        default: new Date()
+        default: Date.now
     }
 
 });
