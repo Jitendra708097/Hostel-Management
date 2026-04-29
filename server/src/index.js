@@ -22,7 +22,7 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:5173",      // Your local React/Vite frontend
-  "http://13.233.230.164"       // Your AWS Production IP
+  "http://13.127.163.95"       // Your AWS Production IP
 ];
 
 // CORS configuration 
