@@ -22,8 +22,11 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:5173",      // Your local React/Vite frontend
-  "http://13.127.163.95"       // Your AWS Production IP
-];
+  "http://13.127.163.95",       // Your AWS Production IP
+  "http://hrithostel.xyz",
+  "https://hrithostel.xyz",
+  process.env.CLIENT_URL,
+].filter(Boolean);
 
 // CORS configuration 
 app.use(cors({
@@ -39,17 +42,21 @@ app.use(cors({
     credentials: true,
 }));
 
+const registerRoutes = (prefix = '') => {
+    app.use(`${prefix}/menu`,menuRouter);
+    app.use(`${prefix}/rules`,rulesRouter);
+    app.use(`${prefix}/registration`,registrationRouter);
+    app.use(`${prefix}/media`, mediaRouter); 
+    app.use(`${prefix}/user`, userRouter); // Assuming you have userRouter defined elsewhere
+    app.use(`${prefix}/circular`,circularRouter);
+    app.use(`${prefix}/attendance`,attendanceRouter);
+    app.use(`${prefix}/leave`,leaveRouter);
+    app.use(`${prefix}/grievance`,grievanceRouter);
+    app.use(`${prefix}/fees`,feeRouter);
+};
 
-app.use('/menu',menuRouter);
-app.use('/rules',rulesRouter);
-app.use('/registration',registrationRouter);
-app.use('/media', mediaRouter); 
-app.use('/user', userRouter); // Assuming you have userRouter defined elsewhere
-app.use('/circular',circularRouter);
-app.use('/attendance',attendanceRouter);
-app.use('/leave',leaveRouter);
-app.use('/grievance',grievanceRouter);
-app.use('/fees',feeRouter);
+registerRoutes();
+registerRoutes('/api');
 
 
 const startServer = async() => {
