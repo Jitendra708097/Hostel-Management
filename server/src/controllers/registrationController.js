@@ -3,13 +3,7 @@ const registrationForm = require('../models/registrationFormSchema');
 
 // Create a new registration
 const registrationController = async (req, res) => {
-    try {
-        const newRegistration = new registrationForm(req.body);
-        const savedRegistration = await newRegistration.save();
-        res.status(201).json(savedRegistration);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }   
+    return res.status(403).json({ message: 'Public registration is disabled. Admissions are handled by the hostel administration.' });
 };
 
 // Get all registrations

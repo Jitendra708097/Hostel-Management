@@ -1,14 +1,14 @@
 const express = require('express');
 const userRouter = express.Router();
 const userMiddleware = require('../middleware/userMiddleware');
-const { register, login, userPasswordChange, getAllUsers, getProfile, deleteUserById, logout, updateDetails, forgotPassword, resetPassword, adminLogin, getAllStudents } = require('../controllers/userController');
+const { register, login, userPasswordChange, getAllUsers, getProfile, deleteUserById, logout, updateDetails, forgotPassword, resetPassword, adminLogin, getAllStudents, adminCreateStudent } = require('../controllers/userController');
 const upload = require('../middleware/uploadMiddleware');
 const adminMiddleware = require('../middleware/adminMiddleware');
 
 
 
 //  for student 
-userRouter.post('/register',upload.single('profilePhoto'), register); // done
+userRouter.post('/register',upload.single('profilePhoto'), register); // self registration disabled
 userRouter.post('/login', login); 
 userRouter.post('/logout',userMiddleware, logout); 
 userRouter.put('/update/:_id', userMiddleware, upload.single('profilePhoto'), updateDetails);
@@ -25,7 +25,12 @@ userRouter.get('/check', userMiddleware, (req, res) => {
             _id:req.user._id, 
             profileURL: req.user.profileURL,
             roomNo: req.user.roomNo,
+            roomPreference: req.user.roomPreference,
+            currentRoomId: req.user.currentRoomId,
             phoneNo: req.user.phoneNo,
+            course: req.user.course,
+            institution: req.user.institution,
+            year: req.user.year,
             role:req.user.role} 
     });
 }
@@ -33,6 +38,7 @@ userRouter.get('/check', userMiddleware, (req, res) => {
 
 //  for admin 
 userRouter.post('/admin/login', adminLogin); // Admin login
+userRouter.post('/admin/create-student', adminMiddleware, upload.single('profilePhoto'), adminCreateStudent);
 userRouter.delete('/delete/:_id', adminMiddleware, deleteUserById); 
 userRouter.get('/getAllStudents', adminMiddleware, getAllStudents);
 userRouter.put('/admin/update/:_id', adminMiddleware, upload.single('profilePhoto'), updateDetails);

@@ -9,9 +9,40 @@ const redisClient = require('../config/redis');
 const bufferToStream = require('../utils/bufferToStream');
 const cloudinary = require('../config/cloudinary');
 
+const buildUserSummary = (user) => ({
+    profileURL: user.profileURL,
+    emailId: user.emailId,
+    userName: user.userName,
+    role: user.role,
+    _id: user._id,
+    course: user.course,
+    institution: user.institution,
+    year: user.year,
+    roomNo: user.roomNo,
+    roomPreference: user.roomPreference,
+    currentRoomId: user.currentRoomId,
+});
+
+const buildStudentCredentialsMessage = ({ userName, emailId, password }) => {
+    const loginUrl = `${process.env.CLIENT_URL || ''}/login`;
+    return `Dear ${userName},
+
+Your hostel student account has been created by the administration.
+
+Login Email: ${emailId}
+Temporary Password: ${password}
+Login URL: ${loginUrl}
+
+Please sign in and change your password after your first login.
+
+Regards,
+Hostel Management Team`;
+};
+
 // This function is for new user registration on this platform with
 // personal information like: useName,course,year,emailID,profilePhoto
 const register = async (req, res) => {
+        return res.status(403).json({ message: 'Self-registration is disabled. Please contact the hostel administration.' });
 
         const isValid = await validatorFunction(req.body);
         if (!isValid.valid)
@@ -49,14 +80,7 @@ const register = async (req, res) => {
         const newUser = await User.create(req.body);
     
         const reply = {
-            profileURL: newUser.profileURL,
-            emailId: newUser.emailId,
-            userName: newUser.userName,
-            role: newUser.role,
-            _id: newUser._id,
-            course: newUser.course,
-            institution: newUser.institution,
-            year: newUser.year,
+            ...buildUserSummary(newUser),
             subject: "Registration Successful",
             message: `Dear ${newUser.userName},\n\nYour registration was successful!\n\nThank you for joining us.\n\nBest regards,\nHostel Management Team`
         };
@@ -83,7 +107,9 @@ const getProfile = async (req, res) => {
         return res.status(403).json({ error: 'You are not authorized to view this profile' });
     }
 
-    const user = await User.findById(_id).select('-password');
+    const user = await User.findById(_id)
+        .select('-password')
+        .populate('currentRoomId', 'roomNumber roomType block floor hostelType capacity occupiedCount status');
     if (!user) {
         return res.status(404).json({ error: 'User not found' });
     }
@@ -94,7 +120,7 @@ const getProfile = async (req, res) => {
 // fetch all existing users on this platform from Database.
 const getAllUsers = async (req, res) => {
     // Logic to get all users here
-    const users = await User.find().select('-password');
+    const users = await User.find().select('-password').populate('currentRoomId', 'roomNumber roomType block floor');
     res.status(200).json({ message: 'All users retrieved successfully!', users });
 }
 
@@ -134,14 +160,7 @@ const login = async (req, res) => {
         return res.status(400).json({ error: 'Invalid email or password' });
     }
     // Successful login
-    const reply = {
-        emailId: user.emailId,
-        userName: user.userName,
-        role: user.role,
-        profileURL: user.profileURL,
-        _id: user._id,
-        course: user.course
-    };
+    const reply = buildUserSummary(user);
     const token =  jwt.sign(
         { _id: user._id, emailId: user.emailId, role: user.role },
         process.env.JWT_SECRET_KEY,
@@ -190,8 +209,8 @@ const updateDetails = async (req, res) => {
         }
 
         const allowedFields = req.user.role === 'admin'
-            ? ['userName', 'phoneNo', 'roomNo', 'course', 'year', 'institution', 'feeStructure', 'totalDues']
-            : ['userName', 'phoneNo', 'roomNo', 'course', 'year', 'institution'];
+            ? ['userName', 'emailId', 'phoneNo', 'course', 'year', 'institution', 'feeStructure', 'totalDues', 'roomPreference']
+            : ['userName', 'phoneNo'];
         const updatedData = {};
         allowedFields.forEach((field) => {
             if (req.body[field] !== undefined && req.body[field] !== '') {
@@ -333,13 +352,7 @@ const adminLogin = async (req, res) => {
         return res.status(400).json({ error: 'Invalid email or password' });
     }
     // Successful login
-    const reply = {
-        emailId: user.emailId,
-        userName: user.userName,
-        role: user.role,
-        profileURL: user.profileURL,
-        _id: user._id
-    };
+    const reply = buildUserSummary(user);
     const token = jwt.sign(
         { _id: user._id, emailId: user.emailId, role: user.role },
         process.env.JWT_SECRET_KEY,
@@ -356,6 +369,7 @@ const getAllStudents = async (req, res) => {
         // Populate the feeStructure and paymentHistory fields
         const students = await User.find({ role: 'student' })
             .populate('feeStructure', 'structureName totalAmount')
+            .populate('currentRoomId', 'roomNumber roomType block floor hostelType capacity occupiedCount status')
             .populate({ path: 'paymentHistory', select: 'amount status createdAt' });
 
         // Compute totals for each student
@@ -371,6 +385,12 @@ const getAllStudents = async (req, res) => {
                 emailId: s.emailId,
                 profileURL: s.profileURL,
                 year: s.year || null,
+                phoneNo: s.phoneNo || null,
+                institution: s.institution || null,
+                course: s.course || null,
+                roomPreference: s.roomPreference || null,
+                roomNo: s.roomNo || null,
+                currentRoom: s.currentRoomId || null,
                 feeStructure: s.feeStructure || null,
                 totalPaid,
                 due,
@@ -422,6 +442,98 @@ const userPasswordChange = async (req,res) => {
     res.status(200).json({ message: "Password Changed Successfully."});
 }
 
+const adminCreateStudent = async (req, res) => {
+    try {
+        const {
+            userName,
+            emailId,
+            password,
+            course,
+            year,
+            institution,
+            phoneNo,
+            roomPreference,
+        } = req.body;
+
+        if (!userName || !emailId || !password || !course || !year || !institution || !phoneNo) {
+            return res.status(400).json({ message: 'Please provide all required student fields.' });
+        }
+
+        const existingUser = await User.findOne({
+            $or: [
+                { emailId: String(emailId).trim().toLowerCase() },
+                { phoneNo: Number(phoneNo) },
+            ],
+        });
+
+        if (existingUser) {
+            return res.status(400).json({ message: 'A student with this email or phone number already exists.' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUserPayload = {
+            userName: String(userName).trim(),
+            emailId: String(emailId).trim().toLowerCase(),
+            password: hashedPassword,
+            course: String(course).trim(),
+            year: Number(year),
+            institution,
+            phoneNo: Number(phoneNo),
+            role: 'student',
+            roomPreference: roomPreference || 'double',
+        };
+
+        if (req.file) {
+            const fileBuffer = req.file.buffer;
+            const fileStream = bufferToStream(fileBuffer);
+            const uploadOptions = {
+                folder: 'Hostel_Management/profileImages',
+                resource_type: req.file.mimetype.startsWith('video/') ? 'video' : 'auto',
+            };
+
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, uploadResult) => {
+                    if (error) return reject(error);
+                    resolve(uploadResult);
+                });
+                fileStream.pipe(uploadStream);
+            });
+
+            newUserPayload.profileURL = result.secure_url;
+            newUserPayload.public_id = result.public_id;
+        }
+
+        const newUser = await User.create(newUserPayload);
+
+        let credentialsEmailSent = true;
+        try {
+            await sendEmail({
+                emailId: newUser.emailId,
+                subject: 'Your Hostel Account Credentials',
+                message: buildStudentCredentialsMessage({
+                    userName: newUser.userName,
+                    emailId: newUser.emailId,
+                    password,
+                }),
+            });
+        } catch (emailError) {
+            credentialsEmailSent = false;
+        }
+
+        res.status(201).json({
+            message: 'Student admitted successfully.',
+            user: buildUserSummary(newUser),
+            credentialsEmailSent,
+            temporaryPassword: credentialsEmailSent ? undefined : password,
+        });
+    } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ message: 'A student with this email or phone number already exists.' });
+        }
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 module.exports = {
     register, 
     getProfile,
@@ -430,4 +542,4 @@ module.exports = {
     login, 
     logout, 
     updateDetails, 
-    forgotPassword, resetPassword, adminLogin, getAllStudents, userPasswordChange};
+    forgotPassword, resetPassword, adminLogin, getAllStudents, userPasswordChange, adminCreateStudent};

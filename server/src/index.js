@@ -15,6 +15,7 @@ const circularRouter = require('./routes/circularRoutes')
 const leaveRouter = require('./routes/leaveRoutes');
 const grievanceRouter = require('./routes/grievanceRouter');
 const feeRouter = require('./routes/feesRoutes');
+const roomRouter = require('./routes/roomRoutes');
 
 
 app.use(cookieParser());
@@ -53,6 +54,7 @@ const registerRoutes = (prefix = '') => {
     app.use(`${prefix}/leave`,leaveRouter);
     app.use(`${prefix}/grievance`,grievanceRouter);
     app.use(`${prefix}/fees`,feeRouter);
+    app.use(`${prefix}/rooms`,roomRouter);
 };
 
 registerRoutes();

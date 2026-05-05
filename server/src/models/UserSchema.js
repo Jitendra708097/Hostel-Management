@@ -34,6 +34,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         enum: ['HRIT', 'Virohan', 'Other']
     },
+    roomPreference: {
+        type: String,
+        enum: ['single', 'double', 'triple'],
+        default: 'double'
+    },
     role: {
         type: String,
         enum: ['admin', 'student'],
@@ -44,10 +49,19 @@ const userSchema = new mongoose.Schema({
         default: 'https://i.pinimg.com/736x/98/1d/6b/981d6b2e0ccb5e968a0618c8d47671da.jpg'
     },
     roomNo: {
-        type: Number,
-        required: true,
-        min: 1,
-        max: 300
+        type: String,
+        trim: true,
+        default: null
+    },
+    currentRoomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Room',
+        default: null
+    },
+    currentAllocationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RoomAllocation',
+        default: null
     },
     phoneNo: {
         type: Number,
