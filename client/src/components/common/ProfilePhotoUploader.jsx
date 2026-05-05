@@ -1,6 +1,6 @@
 // src/components/ProfilePhotoUploader.js
 import { useController } from "react-hook-form";
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, X, Check } from 'lucide-react';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
@@ -9,7 +9,7 @@ import { canvasPreview } from '../../utils/canvasPreview';
 // import { Camera } from "react-icons/fa";
 // This should be the final version of your uploader component
 
-const ProfilePhotoUploader = ({ name, control, setError }) => {
+const ProfilePhotoUploader = ({ name, control, setError, existingImageUrl = '', label = 'Add Photo' }) => {
     // This hook correctly connects this component to the main form state
     const { field } = useController({ name, control });
 
@@ -22,6 +22,11 @@ const ProfilePhotoUploader = ({ name, control, setError }) => {
     const fileInputRef = useRef(null);
     const imgRef = useRef(null);
     const previewCanvasRef = useRef(null);
+
+    useEffect(() => {
+        if (field.value instanceof File || previewUrl) return;
+        setPreviewUrl(existingImageUrl || '');
+    }, [existingImageUrl, field.value, previewUrl]);
 
      const onImageLoad = (e) => {
         const { width, height } = e.currentTarget;
@@ -89,7 +94,7 @@ const ProfilePhotoUploader = ({ name, control, setError }) => {
               <img
                 src={previewUrl}
                 alt="Profile Preview"
-                className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+                className="h-28 w-28 rounded-full border-4 border-white object-cover shadow-lg sm:h-32 sm:w-32"
               />
               <motion.button
                 type="button"
@@ -103,13 +108,21 @@ const ProfilePhotoUploader = ({ name, control, setError }) => {
           ) : (
             <div
               onClick={() => fileInputRef.current.click()}
-              className="w-32 h-32 bg-gray-100 rounded-full flex flex-col items-center justify-center cursor-pointer border-2 border-dashed hover:border-indigo-500 transition-colors"
+              className="flex h-28 w-28 cursor-pointer flex-col items-center justify-center rounded-full border-2 border-dashed bg-gray-100 transition-colors hover:border-indigo-500 sm:h-32 sm:w-32"
             >
               <Camera className="text-gray-400 mb-1" size={32} />
-              <span className="text-xs text-gray-500 font-medium">Add Photo</span>
+              <span className="text-xs text-gray-500 font-medium">{label}</span>
             </div>
           )}
         </div>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="mt-3 inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-cyan-300 hover:text-cyan-700"
+        >
+          <Camera className="h-4 w-4" />
+          {previewUrl ? 'Change Photo' : label}
+        </button>
       </div>
 
       {/* --- Cropper Modal --- */}

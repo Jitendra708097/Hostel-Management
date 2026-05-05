@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router';
 import axiosClient from '../../config/axiosClient';
 import { checkAuthStatus, logout } from '../../redux/authSlicer';
 import PasswordChangeForm from './changePassword';
-import { Camera, LogOut, Save, X } from 'lucide-react';
+import { LogOut, Save, X } from 'lucide-react';
+import ProfilePhotoUploader from '../common/ProfilePhotoUploader';
 
 const ProfileView = () => {
   const dispatch = useDispatch();
@@ -14,7 +15,7 @@ const ProfileView = () => {
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState(null);
 
-  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, control, setError, formState: { isSubmitting } } = useForm({
     defaultValues: {},
   });
 
@@ -56,20 +57,31 @@ const ProfileView = () => {
       const formData = new FormData();
       Object.keys(data).forEach(key => {
         if (data[key] !== undefined && data[key] !== null && data[key] !== '') {
-          if (key === 'profilePhoto' && data[key]?.[0] instanceof File) {
-            formData.append('profilePhoto', data[key][0]);
+          if (key === 'profilePhoto' && data[key] instanceof File) {
+            formData.append('profilePhoto', data[key]);
           } else {
             formData.append(key, data[key]);
           }
         }
       });
 
-      await axiosClient.put(`/user/update/${user._id}`, formData, {
+      const response = await axiosClient.put(`/user/update/${user._id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       // refresh auth user in redux
-      dispatch(checkAuthStatus());
+      await dispatch(checkAuthStatus());
+      const updatedProfile = response?.data?.user;
+      reset({
+        userName: updatedProfile?.userName || data.userName || '',
+        emailId: updatedProfile?.emailId || user?.emailId || '',
+        phoneNo: updatedProfile?.phoneNo || data.phoneNo || '',
+        roomNo: updatedProfile?.roomNo || user?.roomNo || '',
+        course: updatedProfile?.course || user?.course || '',
+        year: updatedProfile?.year || user?.year || '',
+        institution: updatedProfile?.institution || user?.institution || '',
+        profilePhoto: null,
+      });
       setNotice({ type: 'success', message: 'Profile updated successfully.' });
     } catch (err) {
       console.error('Update failed', err);
@@ -91,19 +103,19 @@ const ProfileView = () => {
 
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-slate-50 py-6 sm:py-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto mb-6">
           <p className="text-sm font-medium text-cyan-700">Student Profile</p>
-          <h1 className="text-3xl font-bold text-slate-900">Your Hostel Account</h1>
+          <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Your Hostel Account</h1>
           <p className="mt-1 text-slate-600">Keep your personal and room details up to date.</p>
         </div>
 
-        <div className="max-w-4xl mx-auto bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-          <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="max-w-4xl mx-auto rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-xl font-semibold text-slate-900">Profile Details</h2>
-            <div className="flex items-center gap-3">
-              <button onClick={handleLogout} className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-md border border-red-200 bg-red-50 text-red-700 text-sm font-semibold hover:bg-red-100">
+            <div className="flex w-full items-center gap-3 sm:w-auto">
+              <button onClick={handleLogout} className="cursor-pointer inline-flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100">
                 <LogOut className="h-4 w-4" /> Logout
               </button>
             </div>
@@ -119,20 +131,15 @@ const ProfileView = () => {
           {loading && <p className="mb-4 text-sm text-slate-500">Loading profile...</p>}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-start">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:items-start">
               <div className="col-span-1 flex flex-col items-center">
-                <div className="w-36 h-36 mb-4">
-                  {user?.profileURL ? (
-                    <img src={user.profileURL} alt="avatar" className="w-36 h-36 rounded-full object-cover shadow-md ring-4 ring-cyan-50" />
-                  ) : (
-                    <div className="w-36 h-36 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">No Photo</div>
-                  )}
-                </div>
-                <label className="cursor-pointer inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-cyan-300 hover:text-cyan-700">
-                  <Camera className="h-4 w-4" />
-                  Change Photo
-                  <input type="file" accept="image/*" {...register('profilePhoto')} className="sr-only" />
-                </label>
+                <ProfilePhotoUploader
+                  name="profilePhoto"
+                  control={control}
+                  setError={setError}
+                  existingImageUrl={user?.profileURL || ''}
+                  label="Add Photo"
+                />
               </div>
 
               <div className="col-span-2">
@@ -183,9 +190,9 @@ const ProfileView = () => {
               </div>
             </div>
  
-            <div className="flex justify-end space-x-3">
-              <button type="button" onClick={() => navigate('/student/dashboard')} className="cursor-pointer px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-50">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="cursor-pointer inline-flex items-center gap-2 px-5 py-2 rounded-md bg-cyan-700 text-white font-semibold hover:bg-cyan-800 disabled:opacity-60">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button type="button" onClick={() => navigate('/student/dashboard')} className="cursor-pointer rounded-md border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+              <button type="submit" disabled={isSubmitting} className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-md bg-cyan-700 px-5 py-2 font-semibold text-white hover:bg-cyan-800 disabled:opacity-60">
                 <Save className="h-4 w-4" />
                 {isSubmitting ? 'Saving...' : 'Save Changes'}
               </button>

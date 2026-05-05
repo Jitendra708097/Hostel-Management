@@ -377,18 +377,19 @@ const StudentManager = () => {
             <Toast toast={toast} onClose={() => setToast(null)} />
             <ConfirmActionModal confirmState={confirmState} onCancel={() => setConfirmState(null)} onConfirm={handleConfirmAction} isBusy={isDeleting} />
             <AdminHeader title="Student Management" subtitle="Admit students, assign fee structures, and manage records" />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
                 <Card className="md:col-span-3">
                     <div className="flex items-center gap-2 mb-4">
                         <UserPlus className="h-5 w-5 text-cyan-700" />
                         <h2 className="text-xl font-semibold">Admin Admission</h2>
                     </div>
-                    <form onSubmit={handleAdmitStudent} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <form onSubmit={handleAdmitStudent} className="grid grid-cols-1 gap-4 md:grid-cols-4">
                         <div className="md:col-span-4 flex justify-center">
                             <ProfilePhotoUploader
                                 name="profilePhoto"
                                 control={admissionControl}
                                 setError={setAdmissionError}
+                                label="Add Photo"
                             />
                         </div>
                         <input value={admissionForm.userName} onChange={(e) => handleAdmissionChange('userName', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2" placeholder="Student Name" required />
@@ -413,7 +414,7 @@ const StudentManager = () => {
                             <option value="triple">Triple</option>
                         </select>
                         <div className="md:col-span-4">
-                            <button type="submit" disabled={isAdmitting} className="rounded-md bg-cyan-700 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-800 disabled:opacity-60">
+                            <button type="submit" disabled={isAdmitting} className="w-full rounded-md bg-cyan-700 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-800 disabled:opacity-60 sm:w-auto">
                                 {isAdmitting ? 'Creating student...' : 'Admit Student'}
                             </button>
                         </div>
@@ -468,12 +469,12 @@ const StudentManager = () => {
                 {/* Fully paid list */}
                 <Card className="md:col-span-3">
                     <h3 className="text-lg font-semibold mb-3">Students with Full Payment</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         {students.filter(s => Number(s.due) === 0 && (s.feeStructure?.totalAmount ?? 0) > 0).map(s => (
-                            <div key={s._id} className="flex items-center gap-3 bg-slate-50 border border-slate-200 p-3 rounded-md">
-                                <img src={s.profileURL} alt={s.userName} className="w-12 h-12 rounded-full object-cover" />
+                            <div key={s._id} className="flex items-center gap-3 rounded-md border border-slate-200 bg-slate-50 p-3">
+                                <img src={s.profileURL} alt={s.userName} className="h-12 w-12 rounded-full object-cover" />
                                 <div className="flex-1">
-                                    <p className="font-medium text-gray-800">{s.userName}</p>
+                                    <p className="break-words font-medium text-gray-800">{s.userName}</p>
                                     <p className="text-sm text-gray-500">{s.feeStructure?.structureName || '—'}</p>
                                 </div>
                                 <div className="text-right">
@@ -491,10 +492,10 @@ const StudentManager = () => {
                 {/* Column 1: List of Students */}
                 <Card className="md:col-span-1">
                     <h2 className="text-xl font-semibold mb-4">Students</h2>
-                    <div className="flex gap-2 mb-3">
-                        <button onClick={() => setFilter('Unassigned')} className={`px-3 py-1 rounded-md text-sm font-medium ${filter==='Unassigned' ? 'bg-cyan-700 text-white' : 'bg-white text-gray-700 border border-slate-300 hover:bg-slate-50'}`}>Unassigned</button>
-                        <button onClick={() => setFilter('Assigned')} className={`px-3 py-1 rounded-md text-sm font-medium ${filter==='Assigned' ? 'bg-cyan-700 text-white' : 'bg-white text-gray-700 border border-slate-300 hover:bg-slate-50'}`}>Assigned</button>
-                        <button onClick={() => setFilter('All')} className={`px-3 py-1 rounded-md text-sm font-medium ${filter==='All' ? 'bg-cyan-700 text-white' : 'bg-white text-gray-700 border border-slate-300 hover:bg-slate-50'}`}>All</button>
+                    <div className="mb-3 flex flex-wrap gap-2">
+                        <button onClick={() => setFilter('Unassigned')} className={`rounded-md px-3 py-1 text-sm font-medium ${filter==='Unassigned' ? 'bg-cyan-700 text-white' : 'border border-slate-300 bg-white text-gray-700 hover:bg-slate-50'}`}>Unassigned</button>
+                        <button onClick={() => setFilter('Assigned')} className={`rounded-md px-3 py-1 text-sm font-medium ${filter==='Assigned' ? 'bg-cyan-700 text-white' : 'border border-slate-300 bg-white text-gray-700 hover:bg-slate-50'}`}>Assigned</button>
+                        <button onClick={() => setFilter('All')} className={`rounded-md px-3 py-1 text-sm font-medium ${filter==='All' ? 'bg-cyan-700 text-white' : 'border border-slate-300 bg-white text-gray-700 hover:bg-slate-50'}`}>All</button>
                     </div>
                     <ul className="divide-y divide-gray-200 max-h-[360px] sm:max-h-[600px] overflow-y-auto">
                         {students
@@ -505,13 +506,13 @@ const StudentManager = () => {
                                 return true;
                             })
                             .map(student => (
-                            <li key={student._id} className={`p-3 flex justify-between items-center hover:bg-cyan-50 rounded-md ${selectedStudent?._id === student._id ? 'bg-cyan-50 ring-1 ring-cyan-200' : ''}`}>
-                                <div className="flex-1 cursor-pointer" onClick={() => handleSelectStudent(student)}>
-                                    <p className="font-medium text-gray-800">{student.userName}</p>
-                                    <p className="text-sm text-gray-500">{student.emailId}</p>
+                            <li key={student._id} className={`flex flex-col gap-3 rounded-md p-3 hover:bg-cyan-50 sm:flex-row sm:items-center sm:justify-between ${selectedStudent?._id === student._id ? 'bg-cyan-50 ring-1 ring-cyan-200' : ''}`}>
+                                <div className="min-w-0 flex-1 cursor-pointer" onClick={() => handleSelectStudent(student)}>
+                                    <p className="break-words font-medium text-gray-800">{student.userName}</p>
+                                    <p className="break-all text-sm text-gray-500">{student.emailId}</p>
                                     <p className="text-xs text-slate-500 mt-1">Room: {student.currentRoom?.roomNumber || 'Not allocated'}</p>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-2 self-end sm:self-auto">
                                     <button title="Edit" onClick={() => handleSelectStudent(student)} className="p-2 rounded text-cyan-700 hover:bg-cyan-50">
                                         <Edit2 className="w-4 h-4" />
                                     </button>
@@ -530,17 +531,17 @@ const StudentManager = () => {
                     {selectedStudent ? (
                         <div className="space-y-6">
                             <div>
-                                <div className="flex items-center justify-between">
+                                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                     <div>
                                         {isEditing ? (
                                             <>
-                                                <input value={editValues.userName} onChange={(e) => setEditValues(v => ({ ...v, userName: e.target.value }))} className="border px-2 py-1 rounded-md w-full sm:w-auto" />
-                                                <input value={editValues.emailId} onChange={(e) => setEditValues(v => ({ ...v, emailId: e.target.value }))} className="border px-2 py-1 rounded-md w-full sm:w-auto mt-2 sm:mt-0 sm:ml-2" />
+                                                <input value={editValues.userName} onChange={(e) => setEditValues(v => ({ ...v, userName: e.target.value }))} className="w-full rounded-md border px-2 py-1 sm:w-auto" />
+                                                <input value={editValues.emailId} onChange={(e) => setEditValues(v => ({ ...v, emailId: e.target.value }))} className="mt-2 w-full rounded-md border px-2 py-1 sm:ml-2 sm:mt-0 sm:w-auto" />
                                             </>
                                         ) : (
                                             <>
-                                                <h3 className="text-lg font-bold">{selectedStudent.userName}</h3>
-                                                <p className="text-gray-600">Email: {selectedStudent.emailId}</p>
+                                                <h3 className="break-words text-lg font-bold">{selectedStudent.userName}</h3>
+                                                <p className="break-all text-gray-600">Email: {selectedStudent.emailId}</p>
                                                 <p className="text-gray-600">Room: {selectedStudent.currentRoom?.roomNumber || 'Not allocated yet'}</p>
                                             </>
                                         )}

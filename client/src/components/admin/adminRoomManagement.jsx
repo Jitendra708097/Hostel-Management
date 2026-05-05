@@ -240,7 +240,7 @@ const AdminRoomManagement = () => {
                 </div>
             ) : null}
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
                 <Card className="xl:col-span-1">
                     <div className="flex items-center gap-2 mb-4">
                         <Plus className="h-5 w-5 text-cyan-700" />
@@ -249,7 +249,7 @@ const AdminRoomManagement = () => {
 
                     <form onSubmit={handleSaveRoom} className="space-y-4">
                         <input value={roomForm.roomNumber} onChange={(e) => handleRoomChange('roomNumber', e.target.value)} placeholder="Room Number" className="w-full rounded-md border border-slate-300 px-3 py-2" required />
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <select value={roomForm.hostelType} onChange={(e) => handleRoomChange('hostelType', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2">
                                 <option value="boys">Boys Hostel</option>
                                 <option value="girls">Girls Hostel</option>
@@ -260,14 +260,14 @@ const AdminRoomManagement = () => {
                                 <option value="triple">Triple</option>
                             </select>
                         </div>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <input value={roomForm.block} onChange={(e) => handleRoomChange('block', e.target.value)} placeholder="Block" className="rounded-md border border-slate-300 px-3 py-2" required />
                             <input value={roomForm.floor} onChange={(e) => handleRoomChange('floor', e.target.value)} placeholder="Floor" type="number" className="rounded-md border border-slate-300 px-3 py-2" required />
                             <input value={roomForm.capacity} onChange={(e) => handleRoomChange('capacity', e.target.value)} placeholder="Capacity" type="number" className="rounded-md border border-slate-300 px-3 py-2" required />
                         </div>
                         <input value={roomForm.facilities} onChange={(e) => handleRoomChange('facilities', e.target.value)} placeholder="Facilities, comma separated" className="w-full rounded-md border border-slate-300 px-3 py-2" />
                         <textarea value={roomForm.notes} onChange={(e) => handleRoomChange('notes', e.target.value)} placeholder="Notes" rows={3} className="w-full rounded-md border border-slate-300 px-3 py-2" />
-                        <div className="flex gap-3">
+                        <div className="flex flex-col gap-3 sm:flex-row">
                             <button type="submit" disabled={savingRoom} className="flex-1 rounded-md bg-cyan-700 px-4 py-2 text-white font-semibold hover:bg-cyan-800 disabled:opacity-60">
                                 {savingRoom ? 'Saving...' : editingRoomId ? 'Update Room' : 'Create Room'}
                             </button>
@@ -281,7 +281,7 @@ const AdminRoomManagement = () => {
                 </Card>
 
                 <Card className="xl:col-span-2">
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
                         <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
                             <p className="text-xs text-slate-500">Total Rooms</p>
                             <p className="text-2xl font-bold text-slate-900">{summary?.totalRooms ?? 0}</p>
@@ -304,7 +304,7 @@ const AdminRoomManagement = () => {
                         </div>
                     </div>
 
-                    <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <div>
                             <div className="flex items-center gap-2 mb-3">
                                 <UserPlus className="h-5 w-5 text-cyan-700" />
@@ -390,7 +390,7 @@ const AdminRoomManagement = () => {
                 </Card>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <Card>
                     <div className="flex items-center gap-2 mb-4">
                         <Building2 className="h-5 w-5 text-cyan-700" />
@@ -402,7 +402,7 @@ const AdminRoomManagement = () => {
                     <div className="space-y-3 max-h-[700px] overflow-y-auto">
                         {suggestedRooms.map((room) => (
                             <div key={room._id} className="rounded-lg border border-slate-200 p-4">
-                                <div className="flex items-start justify-between gap-3">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                     <div>
                                         <p className="font-semibold text-slate-900">{room.roomNumber}</p>
                                         <p className="text-sm text-slate-500">{room.block} Block, Floor {room.floor}</p>
@@ -422,7 +422,7 @@ const AdminRoomManagement = () => {
                                     {room.facilities?.length ? <p className="mt-1">Facilities: {room.facilities.join(', ')}</p> : null}
                                 </div>
 
-                                <div className="mt-4 flex gap-2">
+                                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                                     <button onClick={() => startEditRoom(room)} className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50">
                                         <Pencil className="h-4 w-4" />
                                         Edit
@@ -446,9 +446,9 @@ const AdminRoomManagement = () => {
                     <div className="space-y-3 max-h-[700px] overflow-y-auto">
                         {allActiveOccupants.map((occupant) => (
                             <div key={occupant.allocationId} className="rounded-lg border border-slate-200 p-4">
-                                <div className="flex items-start justify-between gap-3">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                     <div>
-                                        <p className="font-semibold text-slate-900">{occupant.userName}</p>
+                                        <p className="break-words font-semibold text-slate-900">{occupant.userName}</p>
                                         <p className="text-sm text-slate-500">{occupant.roomNumber}</p>
                                         <p className="text-sm text-slate-500">{occupant.course} / Year {occupant.year}</p>
                                     </div>

@@ -25,14 +25,14 @@ const StudentMyRoom = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-slate-50 py-8">
+        <div className="min-h-screen bg-slate-50 py-6 sm:py-8">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto">
                     <p className="text-sm font-medium text-cyan-700">Student Portal</p>
-                    <h1 className="text-3xl font-bold text-slate-900">My Room</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">My Room</h1>
                     <p className="mt-1 text-slate-600">View your current hostel allocation and roommate details.</p>
 
-                    <div className="mt-6 rounded-lg border border-slate-200 bg-white shadow-sm p-6">
+                    <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                         {loading ? <p className="text-sm text-slate-500">Loading room details...</p> : null}
                         {error ? <p className="text-sm text-red-600">{error}</p> : null}
                         {!loading && !error && !room ? (
@@ -46,11 +46,11 @@ const StudentMyRoom = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
                                         <p className="text-xs text-slate-500">Room Number</p>
-                                        <p className="text-2xl font-bold text-slate-900">{room.roomNumber}</p>
+                                        <p className="text-xl font-bold text-slate-900 sm:text-2xl">{room.roomNumber}</p>
                                     </div>
                                     <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
                                         <p className="text-xs text-slate-500">Room Type</p>
-                                        <p className="text-2xl font-bold text-slate-900 capitalize">{room.roomType}</p>
+                                        <p className="text-xl font-bold text-slate-900 capitalize sm:text-2xl">{room.roomType}</p>
                                     </div>
                                 </div>
 
@@ -77,8 +77,8 @@ const StudentMyRoom = () => {
                                     <div className="space-y-3">
                                         {(room.occupants || []).map((occupant) => (
                                             <div key={occupant.allocationId} className="rounded-lg border border-slate-200 p-4">
-                                                <p className="font-medium text-slate-900">{occupant.userName}</p>
-                                                <p className="text-sm text-slate-500">{occupant.course} / Year {occupant.year}</p>
+                                                <p className="font-medium text-slate-900 break-words">{occupant.userName}</p>
+                                                <p className="text-sm text-slate-500 break-words">{occupant.course} / Year {occupant.year}</p>
                                             </div>
                                         ))}
                                     </div>
