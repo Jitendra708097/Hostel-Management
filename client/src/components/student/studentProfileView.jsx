@@ -151,17 +151,17 @@ const ProfileView = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Room No.</label>
-                    <input {...register('roomNo')} className={inputClass} />
+                    <input {...register('roomNo')} className={inputClass} disabled />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Course</label>
-                    <input {...register('course')} className={inputClass} />
+                    <input {...register('course')} className={inputClass} disabled />
                   </div>
 
                   {/* select year */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Year</label>
-                    <select {...register('year')} className={inputClass}>
+                    <select {...register('year')} className={inputClass} disabled>
                       <option value="">Select</option>
                       <option value="1">1</option>
                       <option value="2">2</option>
@@ -173,7 +173,7 @@ const ProfileView = () => {
                   {/* Institution  */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Institution</label>
-                    <select {...register('institution')} className={inputClass}>
+                    <select {...register('institution')} className={inputClass} disabled>
                       <option value="">Select</option>
                       <option value="HRIT">HRIT</option>
                       <option value="Virohan">Virohan</option>

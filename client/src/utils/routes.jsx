@@ -1,4 +1,4 @@
-import {  FiBell, FiUserPlus, FiFileText, FiMessageSquare, FiTrendingUp, FiCalendar, FiDollarSign } from 'react-icons/fi';
+import {  FiBell, FiUserPlus, FiFileText, FiMessageSquare, FiTrendingUp, FiCalendar, FiDollarSign, FiHome } from 'react-icons/fi';
 
 export const features = [
         { name: 'Student Management', icon: <FiUserPlus className="text-4xl" />, description: 'Add, view, and manage student details.', path: "/admin/student-management" },
@@ -8,4 +8,5 @@ export const features = [
         { name: 'Circulars', icon: <FiBell className="text-4xl" />, description: 'Publish notices and announcements.', path: "/admin/circulars" },
         { name: 'Fees Management', icon: <FiDollarSign className="text-4xl" />, description: 'Track and manage student fee payments.', path: "/admin/fees" },
         { name: 'Mess Menu', icon: <FiCalendar className="text-4xl" />, description: 'Update and manage the weekly mess menu.', path: "/admin/update-menu" },
+        { name: 'Room Management', icon: <FiHome className="text-4xl" />, description: 'Manage room inventory and allocate students.', path: "/admin/rooms" },
     ];

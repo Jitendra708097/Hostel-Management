@@ -8,7 +8,6 @@ import { checkAuthStatus } from './src/redux/authSlicer';
 import HomePage from './src/components/homePage/HomePage';
 import AdminLoginPage from './src/components/admin/adminLoginPage';
 import WeeklyMenuPage from './src/components/student/studentMenuPage';
-import RegisterForm from './src/components/student/studentRegister';
 import StudentLoginPage from './src/components/student/studentLoginPage';
 import AttendanceDashboard from './src/components/admin/adminAttendanceDashboard';
 import StudentAttendenceRecords from './src/components/student/studentAttendanceRecords';
@@ -26,6 +25,8 @@ import ProfileView from './src/components/student/studentProfileView';
 import StudentManager from './src/components/admin/adminStudentManager';
 import UpdateMenu from './src/components/admin/adminUpdateMenu';
 import ResetPasswordPage from './src/components/common/reset-password';
+import AdminRoomManagement from './src/components/admin/adminRoomManagement';
+import StudentMyRoom from './src/components/student/studentMyRoom';
 
 const App = () => {
 
@@ -71,7 +72,7 @@ const App = () => {
             {/* Home Page: Redirects authenticated users */}
             <Route path="/" element={ authenticatedRedirectPath ? <Navigate to={authenticatedRedirectPath} replace /> : <HomePage /> } />
             <Route path='/login' element={ authenticatedRedirectPath ? <Navigate to={authenticatedRedirectPath} replace /> : <StudentLoginPage />}  />
-            <Route path="/register"  element={ authenticatedRedirectPath ? <Navigate to={authenticatedRedirectPath} replace /> : <RegisterForm /> } />
+            <Route path="/register"  element={<Navigate to="/login" replace />} />
             <Route path="/admin/login" element={ authenticatedRedirectPath ? <Navigate to={authenticatedRedirectPath} replace /> : <AdminLoginPage />}  />
 
 
@@ -84,6 +85,7 @@ const App = () => {
             <Route path='/student/leave-request'  element={renderProtectedElement("student", Leavepage, "/login")}  />
             <Route path="/student/fees"  element={renderProtectedElement("student", StudentFees, "/login")} />
             <Route path="/student/circulars"  element={renderProtectedElement("student", () => <CircularsPage isAdmin={false} />, "/login")} />
+            <Route path="/student/my-room"  element={renderProtectedElement("student", StudentMyRoom, "/login")} />
 
            {/* PROTECTED ADMIN ROUTES (Ternary Check)  */}
             <Route path="/admin/dashboard"  element={renderProtectedElement("admin", AdminDashboard, "/admin/login")} />
@@ -94,6 +96,7 @@ const App = () => {
             <Route path="/admin/fees"  element={renderProtectedElement("admin", AdminFeesDashboard, "/admin/login")} />
             <Route path="/admin/student-management"  element={renderProtectedElement("admin", StudentManager, "/admin/login")}   />
             <Route path="/admin/update-menu" element={renderProtectedElement("admin", UpdateMenu, "/admin/login")} />
+            <Route path="/admin/rooms" element={renderProtectedElement("admin", AdminRoomManagement, "/admin/login")} />
 
             {/* Catch-all for 404 Not Found (Optional) */}
            <Route path='/reset-password/:token/:userId?' element={<ResetPasswordPage />} />

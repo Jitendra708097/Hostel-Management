@@ -277,14 +277,8 @@ const AdminLoginPage = () => {
                 </motion.div>
 
                  {/* Register Link */}
-                <motion.div variants={itemVariants} className="text-center text-sm">
-                  <span className="text-gray-600">Don't have an account? </span>
-                  <Link
-                    to="/register"  
-                    className="text-blue-800 hover:text-cyan-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 rounded-md p-1"
-                  >
-                    Register Here
-                  </Link>
+                <motion.div variants={itemVariants} className="text-center text-sm text-gray-600">
+                  Student accounts are created by the hostel administration.
                 </motion.div>
 
               </motion.form>

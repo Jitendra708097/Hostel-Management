@@ -15,6 +15,7 @@ const StudentDashboard = () => {
         { name: 'Fee Payment', icon: <FiDollarSign className="text-4xl" />, description: 'Check your fee status and pay online.', path: "/student/fees" },
         { name: 'Attendance', icon: <FiCheckCircle className="text-4xl" />, description: 'View your attendance record.', path: "/student/attendance" },
         { name: 'Circulars', icon: <FiBell className="text-4xl" />, description: 'Check the latest notices and announcements.', path: "/student/circulars" },
+        { name: 'My Room', icon: <FiCalendar className="text-4xl" />, description: 'See your current room allocation and roommates.', path: "/student/my-room" },
     ];
 
     // loading when api call 

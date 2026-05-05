@@ -124,10 +124,10 @@ const HomePage = () => {
               Student Login
             </Link>
             <Link 
-              to="/register" 
+              to="/admin/login" 
               className="px-5 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-blue-600 to-blue-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:from-blue-700 hover:to-blue-800"
             >
-              New Registration
+              Admin Portal
             </Link>
           </div>
           
@@ -172,10 +172,10 @@ const HomePage = () => {
                 Student Login
               </Link>
               <Link 
-                to="/register" 
+                to="/admin/login" 
                 className="block text-center py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg shadow-sm transition-all duration-200"
               >
-                New Registration
+                Admin Portal
               </Link>
             </div>
           </div>
@@ -264,11 +264,11 @@ const HomePage = () => {
         {/* CTA Buttons */}
         <div className="flex flex-wrap gap-4 pt-4">
           <Link 
-            to="/register" 
+            to="/admin/login" 
             className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
           >
             <UserPlus className="w-5 h-5" />
-            Start Your Journey
+            Admission Desk
           </Link>
           <Link 
             to="/login" 

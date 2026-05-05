@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { AlertTriangle, CheckCircle2, Info, ServerCrash, Trash2, Edit2, Save, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, ServerCrash, Trash2, Edit2, Save, X, UserPlus } from 'lucide-react';
 import axiosClient from '../../config/axiosClient';
 import AdminHeader from './AdminHeader';
+import ProfilePhotoUploader from '../common/ProfilePhotoUploader';
+import { useForm } from 'react-hook-form';
 
 // --- Reusable UI Components (Internalized) ---
 const Card = ({ children, className = '' }) => <div className={`bg-white shadow-sm border border-slate-200 rounded-lg p-6 ${className}`}>{children}</div>;
@@ -85,6 +87,22 @@ const StudentManager = () => {
     const [filter, setFilter] = useState('Unassigned'); // 'All' | 'Assigned' | 'Unassigned'
     const [toast, setToast] = useState(null);
     const [confirmState, setConfirmState] = useState(null);
+    const [admissionForm, setAdmissionForm] = useState({
+        userName: '',
+        emailId: '',
+        password: '',
+        phoneNo: '',
+        course: '',
+        year: '1',
+        institution: 'HRIT',
+        roomPreference: 'double',
+    });
+    const [isAdmitting, setIsAdmitting] = useState(false);
+    const { control: admissionControl, setError: setAdmissionError, reset: resetAdmissionForm, getValues: getAdmissionValues } = useForm({
+        defaultValues: {
+            profilePhoto: null,
+        },
+    });
 
     const showToast = useCallback((type, title, message = '') => {
         setToast({ type, title, message });
@@ -199,6 +217,55 @@ const StudentManager = () => {
         }
     };
 
+    const handleAdmissionChange = (field, value) => {
+        setAdmissionForm((current) => ({ ...current, [field]: value }));
+    };
+
+    const handleAdmitStudent = async (event) => {
+        event.preventDefault();
+        setIsAdmitting(true);
+        try {
+            const payload = new FormData();
+            Object.entries({
+                ...admissionForm,
+                year: Number(admissionForm.year),
+                phoneNo: Number(admissionForm.phoneNo),
+            }).forEach(([key, value]) => {
+                payload.append(key, value);
+            });
+
+            const admissionValues = getAdmissionValues();
+            if (admissionValues.profilePhoto instanceof File) {
+                payload.append('profilePhoto', admissionValues.profilePhoto);
+            }
+
+            const response = await axiosClient.post('/user/admin/create-student', payload, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            setAdmissionForm({
+                userName: '',
+                emailId: '',
+                password: '',
+                phoneNo: '',
+                course: '',
+                year: '1',
+                institution: 'HRIT',
+                roomPreference: 'double',
+            });
+            resetAdmissionForm({ profilePhoto: null });
+            if (response.data?.credentialsEmailSent === false) {
+                showToast('info', 'Student admitted', `Account created, but email delivery failed. Temporary password: ${response.data.temporaryPassword}`);
+            } else {
+                showToast('success', 'Student admitted', 'The student account has been created and credentials were emailed.');
+            }
+            fetchData();
+        } catch (err) {
+            showToast('error', 'Admission failed', getErrorMessage(err, 'Could not create the student account.'));
+        } finally {
+            setIsAdmitting(false);
+        }
+    };
+
     const requestDeleteStudent = (studentId, studentName = 'this student') => {
         setConfirmState({
             type: 'delete',
@@ -309,8 +376,49 @@ const StudentManager = () => {
         <div className="bg-slate-50 min-h-screen p-4 sm:p-6 lg:p-8">
             <Toast toast={toast} onClose={() => setToast(null)} />
             <ConfirmActionModal confirmState={confirmState} onCancel={() => setConfirmState(null)} onConfirm={handleConfirmAction} isBusy={isDeleting} />
-            <AdminHeader title="Student Fee Management" subtitle="Assign structures, view payments and manage students" />
+            <AdminHeader title="Student Management" subtitle="Admit students, assign fee structures, and manage records" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <Card className="md:col-span-3">
+                    <div className="flex items-center gap-2 mb-4">
+                        <UserPlus className="h-5 w-5 text-cyan-700" />
+                        <h2 className="text-xl font-semibold">Admin Admission</h2>
+                    </div>
+                    <form onSubmit={handleAdmitStudent} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="md:col-span-4 flex justify-center">
+                            <ProfilePhotoUploader
+                                name="profilePhoto"
+                                control={admissionControl}
+                                setError={setAdmissionError}
+                            />
+                        </div>
+                        <input value={admissionForm.userName} onChange={(e) => handleAdmissionChange('userName', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2" placeholder="Student Name" required />
+                        <input value={admissionForm.emailId} onChange={(e) => handleAdmissionChange('emailId', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2" placeholder="Email ID" type="email" required />
+                        <input value={admissionForm.password} onChange={(e) => handleAdmissionChange('password', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2" placeholder="Temporary Password" type="password" required />
+                        <input value={admissionForm.phoneNo} onChange={(e) => handleAdmissionChange('phoneNo', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2" placeholder="Phone Number" type="number" required />
+                        <input value={admissionForm.course} onChange={(e) => handleAdmissionChange('course', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2" placeholder="Course" required />
+                        <select value={admissionForm.year} onChange={(e) => handleAdmissionChange('year', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2">
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                        <select value={admissionForm.institution} onChange={(e) => handleAdmissionChange('institution', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2">
+                            <option value="HRIT">HRIT</option>
+                            <option value="Virohan">Virohan</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <select value={admissionForm.roomPreference} onChange={(e) => handleAdmissionChange('roomPreference', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2">
+                            <option value="single">Single</option>
+                            <option value="double">Double</option>
+                            <option value="triple">Triple</option>
+                        </select>
+                        <div className="md:col-span-4">
+                            <button type="submit" disabled={isAdmitting} className="rounded-md bg-cyan-700 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-800 disabled:opacity-60">
+                                {isAdmitting ? 'Creating student...' : 'Admit Student'}
+                            </button>
+                        </div>
+                    </form>
+                </Card>
                 {/* Stats Panel */}
                 <Card className="md:col-span-3 mb-4">
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0">
@@ -401,6 +509,7 @@ const StudentManager = () => {
                                 <div className="flex-1 cursor-pointer" onClick={() => handleSelectStudent(student)}>
                                     <p className="font-medium text-gray-800">{student.userName}</p>
                                     <p className="text-sm text-gray-500">{student.emailId}</p>
+                                    <p className="text-xs text-slate-500 mt-1">Room: {student.currentRoom?.roomNumber || 'Not allocated'}</p>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2">
                                     <button title="Edit" onClick={() => handleSelectStudent(student)} className="p-2 rounded text-cyan-700 hover:bg-cyan-50">
@@ -432,6 +541,7 @@ const StudentManager = () => {
                                             <>
                                                 <h3 className="text-lg font-bold">{selectedStudent.userName}</h3>
                                                 <p className="text-gray-600">Email: {selectedStudent.emailId}</p>
+                                                <p className="text-gray-600">Room: {selectedStudent.currentRoom?.roomNumber || 'Not allocated yet'}</p>
                                             </>
                                         )}
                                     </div>
