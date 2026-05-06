@@ -1,5 +1,21 @@
 const Menu = require('../models/menuSchema');
 
+const VALID_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const VALID_MEALS = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
+
+const sendMenuError = (res, error) => {
+    if (error.name === 'ValidationError') {
+        const message = Object.values(error.errors).map(err => err.message).join(', ');
+        return res.status(400).json({ message });
+    }
+
+    if (error.code === 11000) {
+        return res.status(409).json({ message: 'Menu for this day already exists' });
+    }
+
+    return res.status(500).json({ message: 'Server error', error: error.message });
+};
+
 // it will show whole menu to user
 const getMenu = async(req,res) => {
     try{
@@ -43,16 +59,28 @@ const addMenu = async(req,res) => {
         res.status(201).json({message: 'Menu item added successfully', menu: newMenu});
     }
     catch(error){
-        res.status(500).json({message: 'Server error', error: error.message});
+        sendMenuError(res, error);
     }
 }
 
 // it will update the menu item of the menu these routes for admin 
 const updateMenu = async (req, res) => {
     try {
-        const { day, meal, itemName } = req.body;
+        const day = typeof req.body.day === 'string' ? req.body.day.trim() : '';
+        const meal = typeof req.body.meal === 'string' ? req.body.meal.trim() : '';
+        const itemName = typeof req.body.itemName === 'string' ? req.body.itemName.trim() : '';
+
         if (!day || !meal || !itemName) {
             return res.status(400).json({ message: 'Day, meal, and itemName are required' });
+        }
+        if (!VALID_DAYS.includes(day)) {
+            return res.status(400).json({ message: 'Invalid day selected' });
+        }
+        if (!VALID_MEALS.includes(meal)) {
+            return res.status(400).json({ message: 'Invalid meal selected' });
+        }
+        if (itemName.length < 3 || itemName.length > 100) {
+            return res.status(400).json({ message: 'Item name must be between 3 and 100 characters' });
         }
 
         // Find the menu for the given day
@@ -80,7 +108,7 @@ const updateMenu = async (req, res) => {
 
         res.status(200).json({ message: 'Menu updated successfully', menu });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        sendMenuError(res, error);
     }
 }
 
