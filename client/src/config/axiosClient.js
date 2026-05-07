@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const apiBaseURL = import.meta.env.VITE_API_URL || '/api';
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '';
+const apiBaseURL = import.meta.env.VITE_API_URL || (isLocalhost ? 'http://localhost:3000' : '/api');
 
 // this is a function which creates an axios 
 // instance with predefined configuration settings
