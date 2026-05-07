@@ -1,6 +1,14 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axioClient from '../config/axiosClient';
 
+const getSerializableError = (error, fallback = 'Something went wrong. Please try again.') => {
+  const message = error?.response?.data?.error || error?.response?.data?.message || error?.message || fallback;
+  return {
+    ...(error?.response?.data && typeof error.response.data === 'object' ? error.response.data : {}),
+    error: message,
+    message,
+  };
+};
 
 // register user your self 
 export const registerUser = createAsyncThunk(
@@ -15,7 +23,7 @@ export const registerUser = createAsyncThunk(
       
       return response.data.user;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(getSerializableError(error, 'Registration failed'));
     }
   }
 );
@@ -28,7 +36,7 @@ export const loginUser = createAsyncThunk(
       const response = await axioClient.post('/user/login', credentials);
       return response.data.user;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(getSerializableError(error, 'Login failed'));
     }
   }
 );
@@ -41,7 +49,7 @@ export const adminLoginUser = createAsyncThunk(
       const response = await axioClient.post('/user/admin/login', credentials);
       return response.data.user;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(getSerializableError(error, 'Admin login failed'));
     }
   }
 );
@@ -57,7 +65,7 @@ export const checkAuthStatus = createAsyncThunk(
       if( error.response?.status === 401){
         return rejectWithValue(null);
       }
-      return rejectWithValue(error);
+      return rejectWithValue(getSerializableError(error, 'Unable to check authentication status'));
     } 
   }
 );
@@ -70,7 +78,7 @@ export const logout = createAsyncThunk(
       await axioClient.post('/user/logout');
       return null;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Logout failed' });
+      return rejectWithValue(getSerializableError(error, 'Logout failed'));
     }
   }
 )

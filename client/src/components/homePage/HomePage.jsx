@@ -26,7 +26,7 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         const response = await axiosClient.get('/menu/show');
-        setMenuData(response.data || []);
+        setMenuData(Array.isArray(response.data) ? response.data : []);
         logger.success('Fetched menu data', response.data);
       } catch {
         setMenuData([]);
@@ -214,7 +214,7 @@ const HomePage = () => {
   />
   
   {/* Subtle grid pattern */}
-  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
+  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[64px_64px] mask-[radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
   
   <div className="relative z-10 container mx-auto px-6 py-20">
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -282,7 +282,7 @@ const HomePage = () => {
 
       {/* Image Section */}
       <div className="relative">
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] max-h-[460px]">
+        <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-4/3 max-h-[460px]">
           <img 
             src='https://res.cloudinary.com/dvjndnhc7/image/upload/v1764606074/hostelPhoto_y8m1yl.jpg' 
             alt="Modern Hostel Facilities" 
@@ -373,7 +373,7 @@ const HomePage = () => {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <div className="space-y-8">
               {/* Mess Timings */}
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
@@ -385,17 +385,15 @@ const HomePage = () => {
                   <div className="w-3 h-8 bg-cyan-600 rounded-full"></div>
                   Mess Timings
                 </h3>
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {MESS_TIMINGS.map((timing, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-cyan-50 rounded-xl hover:bg-cyan-100 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-cyan-600 rounded-lg flex items-center justify-center">
-                          <Utensils className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-gray-900">{timing.meal}</div>
-                          <div className="text-sm text-gray-600">{timing[timing.meal.toLowerCase()]}</div>
-                        </div>
+                    <div key={index} className="flex items-center gap-3 p-4 bg-cyan-50 rounded-xl hover:bg-cyan-100 transition-colors">
+                      <div className="w-10 h-10 bg-cyan-600 rounded-lg flex shrink-0 items-center justify-center">
+                        <Utensils className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-gray-900">{timing.meal}</div>
+                        <div className="text-sm text-gray-600">{timing[timing.meal.toLowerCase()]}</div>
                       </div>
                     </div>
                   ))}
@@ -414,25 +412,24 @@ const HomePage = () => {
                   Weekly Menu
                 </h3>
                 
-                <div className="overflow-hidden">
-                  <div className="hidden md:block">
-                    <table className="w-full text-sm">
+                <div className="overflow-x-auto rounded-xl border border-cyan-200">
+                    <table className="min-w-[760px] w-full border-collapse text-sm">
                       <thead>
-                        <tr className="border-b-2 border-cyan-200">
-                          <th className="text-left pb-4 font-semibold text-gray-900">Day</th>
+                        <tr className="bg-cyan-50">
+                          <th className="border border-cyan-200 px-4 py-3 text-left font-semibold text-gray-900">Day</th>
                           {['Breakfast', 'Lunch', 'Snack', 'Dinner'].map(meal => (
-                            <th key={meal} className="pb-4 font-semibold text-gray-900 text-center">{meal}</th>
+                            <th key={meal} className="border border-cyan-200 px-4 py-3 text-center font-semibold text-gray-900">{meal}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
                         {menuData.map((day) => (
-                          <tr key={day.days} className="border-b border-cyan-100 last:border-0">
-                            <td className="py-4 font-semibold text-gray-900">{day.days}</td>
+                          <tr key={day.days} className="hover:bg-cyan-50/60">
+                            <td className="border border-cyan-200 px-4 py-3 font-semibold text-gray-900 whitespace-nowrap">{day.days}</td>
                             {['Breakfast','Lunch','Snack','Dinner'].map(meal => {
                               const item = day.mealAndItem?.find(m => m.meal.toLowerCase() === meal.toLowerCase());
                               return (
-                                <td key={meal} className="py-4 text-center text-gray-700">
+                                <td key={meal} className="border border-cyan-200 px-4 py-3 text-center text-gray-700">
                                   {item?.itemName ?? '-'}
                                 </td>
                               );
@@ -441,27 +438,6 @@ const HomePage = () => {
                         ))}
                       </tbody>
                     </table>
-                  </div>
-
-                  {/* Mobile view */}
-                  <div className="md:hidden space-y-4">
-                    {menuData.map(day => (
-                      <div key={day.days} className="bg-cyan-50 p-4 rounded-xl">
-                        <div className="font-bold text-gray-900 mb-3 text-lg">{day.days}</div>
-                        <div className="grid grid-cols-2 gap-3">
-                          {['Breakfast','Lunch','Snack','Dinner'].map(meal => {
-                            const item = day.mealAndItem?.find(m => m.meal.toLowerCase() === meal.toLowerCase());
-                            return (
-                              <div key={meal} className="bg-white p-3 rounded-lg">
-                                <div className="text-xs text-cyan-700 font-semibold mb-1">{meal}</div>
-                                <div className="text-sm font-medium text-gray-900">{item?.itemName ?? '-'}</div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </motion.div>
             </div>
